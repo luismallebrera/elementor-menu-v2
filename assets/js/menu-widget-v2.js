@@ -39,51 +39,8 @@
                 }
             });
             
-            // Handle Action Button
-            var actionButtonEnabled = $horizontalMenu.data('action-button') === 'yes';
-            
-            if (actionButtonEnabled) {
-                var $menuItems = $horizontalMenu.find('> .menu > li');
-                var $lastItem = $menuItems.last();
-                
-                if ($lastItem.length) {
-                    // Add action-button class to last item
-                    $lastItem.addClass('action-button');
-                    
-                    // Remove divider from previous item
-                    $lastItem.prev().addClass('no-divider');
-                    
-                    // Add icon if specified
-                    var actionIconData = $horizontalMenu.data('action-icon');
-                    var iconPosition = $horizontalMenu.data('action-icon-position') || 'before';
-                    
-                    if (actionIconData) {
-                        try {
-                            var actionIcon = typeof actionIconData === 'string' ? JSON.parse(actionIconData) : actionIconData;
-                            var $link = $lastItem.find('> a');
-                            var iconHtml = '';
-                            
-                            // Generate icon HTML
-                            if (actionIcon.library === 'svg' && actionIcon.value && actionIcon.value.url) {
-                                iconHtml = '<span class="action-button-icon-' + iconPosition + '"><img src="' + actionIcon.value.url + '" alt=""></span>';
-                            } else if (actionIcon.value) {
-                                iconHtml = '<span class="action-button-icon-' + iconPosition + '"><i class="' + actionIcon.value + '"></i></span>';
-                            }
-                            
-                            // Insert icon based on position
-                            if (iconHtml) {
-                                if (iconPosition === 'before') {
-                                    $link.prepend(iconHtml);
-                                } else {
-                                    $link.append(iconHtml);
-                                }
-                            }
-                        } catch(e) {
-                            console.error('Error parsing action button icon:', e);
-                        }
-                    }
-                }
-            }
+            // Action button is now rendered directly from PHP
+            // No need to convert the last menu item
         }
         
         if (!$toggle.length) {
