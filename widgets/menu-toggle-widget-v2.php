@@ -3845,16 +3845,18 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                     .elementor-element-' . $this->get_id() . ' .menu-main-container {
                         display: flex !important;
                         justify-content: space-between !important;
+                        align-items: center !important;
                     }
                     .elementor-element-' . $this->get_id() . ' .menu-logo {
                         flex-shrink: 0 !important;
                     }
-                    .elementor-element-' . $this->get_id() . ' .site-navigation-toggle-holder.show-on-mobile {
-                        margin-left: auto !important;
-                    }
                     .elementor-element-' . $this->get_id() . ' .action-button-wrapper {
                         flex-shrink: 0 !important;
-                        margin-left: 15px !important;
+                        margin-left: auto !important;
+                        margin-right: 15px !important;
+                    }
+                    .elementor-element-' . $this->get_id() . ' .site-navigation-toggle-holder.show-on-mobile {
+                        flex-shrink: 0 !important;
                     }
                 }
                 @media (min-width: ' . ($mobile_breakpoint + 1) . 'px) {
@@ -3961,33 +3963,6 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                     ?>
                 </nav>
                 
-                <?php
-                // Render action button as separate element outside the menu
-                if ($enable_action_button) :
-                    $button_text = $settings['action_button_text'] ?? 'Get Started';
-                    $button_link = $settings['action_button_link']['url'] ?? '#';
-                    $button_target = !empty($settings['action_button_link']['is_external']) ? ' target="_blank"' : '';
-                    $button_nofollow = !empty($settings['action_button_link']['nofollow']) ? ' rel="nofollow"' : '';
-                    $icon_position = $settings['action_button_icon_position'] ?? 'before';
-                    $has_icon = !empty($settings['action_button_icon']['value']);
-                ?>
-                    <div class="action-button-wrapper">
-                        <a href="<?php echo esc_url($button_link); ?>" class="action-button"<?php echo $button_target . $button_nofollow; ?>>
-                            <?php if ($has_icon && $icon_position === 'before') : ?>
-                                <span class="action-button-icon-before">
-                                    <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
-                                </span>
-                            <?php endif; ?>
-                            <span><?php echo esc_html($button_text); ?></span>
-                            <?php if ($has_icon && $icon_position === 'after') : ?>
-                                <span class="action-button-icon-after">
-                                    <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
-                                </span>
-                            <?php endif; ?>
-                        </a>
-                    </div>
-                <?php endif; ?>
-                
                 <?php 
                 // Show toggle button for horizontal with mobile toggle OR toggle-on-scroll
                 if (($menu_type === 'horizontal' && $enable_mobile_toggle) || $menu_type === 'toggle-on-scroll') : 
@@ -4028,6 +4003,33 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                             ]);
                             ?>
                         </div>
+                    </div>
+                <?php endif; ?>
+                
+                <?php
+                // Render action button as separate element after toggle
+                if ($enable_action_button) :
+                    $button_text = $settings['action_button_text'] ?? 'Get Started';
+                    $button_link = $settings['action_button_link']['url'] ?? '#';
+                    $button_target = !empty($settings['action_button_link']['is_external']) ? ' target="_blank"' : '';
+                    $button_nofollow = !empty($settings['action_button_link']['nofollow']) ? ' rel="nofollow"' : '';
+                    $icon_position = $settings['action_button_icon_position'] ?? 'before';
+                    $has_icon = !empty($settings['action_button_icon']['value']);
+                ?>
+                    <div class="action-button-wrapper">
+                        <a href="<?php echo esc_url($button_link); ?>" class="action-button"<?php echo $button_target . $button_nofollow; ?>>
+                            <?php if ($has_icon && $icon_position === 'before') : ?>
+                                <span class="action-button-icon-before">
+                                    <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
+                                </span>
+                            <?php endif; ?>
+                            <span><?php echo esc_html($button_text); ?></span>
+                            <?php if ($has_icon && $icon_position === 'after') : ?>
+                                <span class="action-button-icon-after">
+                                    <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
                     </div>
                 <?php endif; ?>
             <?php else : 
