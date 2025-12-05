@@ -2149,6 +2149,43 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
             ]
         );
 
+        $this->add_responsive_control(
+            'action_button_spacing',
+            [
+                'label' => esc_html__('Spacing Right', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', 'rem'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                        'step' => 1,
+                    ],
+                    'em' => [
+                        'min' => 0,
+                        'max' => 10,
+                        'step' => 0.1,
+                    ],
+                    'rem' => [
+                        'min' => 0,
+                        'max' => 10,
+                        'step' => 0.1,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 15,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-wrapper' => 'margin-right: {{SIZE}}{{UNIT}};',
+                ],
+                'separator' => 'before',
+                'condition' => [
+                    'enable_action_button' => 'yes',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
 
         // Logo Style Section
@@ -3851,7 +3888,6 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                     }
                     .elementor-element-' . $this->get_id() . ' .action-button-wrapper {
                         margin-left: auto !important;
-                        margin-right: 15px !important;
                     }
                     .elementor-element-' . $this->get_id() . ' .site-navigation-toggle-holder.show-on-mobile {
                         margin-left: 0 !important;
