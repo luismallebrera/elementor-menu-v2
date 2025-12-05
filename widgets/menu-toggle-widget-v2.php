@@ -2158,7 +2158,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'range' => [
                     'px' => [
                         'min' => 0,
-                        'max' => 100,
+                        'max' => 200,
                         'step' => 1,
                     ],
                     'em' => [
@@ -2174,7 +2174,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 15,
+                    'size' => 100,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .action-button-wrapper' => 'margin-right: {{SIZE}}{{UNIT}};',
