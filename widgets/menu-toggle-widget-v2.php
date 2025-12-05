@@ -3373,9 +3373,19 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
             [
                 'label' => esc_html__('Right Offset', 'elementor-menu-widget-v2'),
                 'type' => \Elementor\Controls_Manager::SLIDER,
-                'size_units' => ['px', '%'],
+                'size_units' => ['px', '%', 'vw'],
                 'range' => [
                     'px' => [
+                        'min' => -100,
+                        'max' => 100,
+                        'step' => 1,
+                    ],
+                    '%' => [
+                        'min' => -100,
+                        'max' => 100,
+                        'step' => 1,
+                    ],
+                    'vw' => [
                         'min' => -100,
                         'max' => 100,
                         'step' => 1,
