@@ -2483,6 +2483,28 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
             ]
         );
 
+        $this->add_group_control(
+            \Elementor\Group_Control_Border::get_type(),
+            [
+                'name' => 'panel_item_border',
+                'label' => esc_html__('Item Border', 'elementor-menu-widget-v2'),
+                'selector' => '{{WRAPPER}} .action-button-panel-menu ul li a',
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'panel_item_border_radius',
+            [
+                'label' => esc_html__('Item Border Radius', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul li a' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
 
         // Logo Style Section
