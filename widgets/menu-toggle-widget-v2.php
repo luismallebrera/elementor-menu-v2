@@ -3844,19 +3844,25 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                     /* Mobile layout adjustments */
                     .elementor-element-' . $this->get_id() . ' .menu-main-container {
                         display: flex !important;
-                        justify-content: space-between !important;
+                        justify-content: flex-start !important;
                         align-items: center !important;
+                        gap: 15px !important;
                     }
                     .elementor-element-' . $this->get_id() . ' .menu-logo {
                         flex-shrink: 0 !important;
+                        order: 1 !important;
+                    }
+                    .elementor-element-' . $this->get_id() . ' .horizontal-menu-nav {
+                        order: 2 !important;
                     }
                     .elementor-element-' . $this->get_id() . ' .action-button-wrapper {
                         flex-shrink: 0 !important;
+                        order: 3 !important;
                         margin-left: auto !important;
-                        margin-right: 15px !important;
                     }
                     .elementor-element-' . $this->get_id() . ' .site-navigation-toggle-holder.show-on-mobile {
                         flex-shrink: 0 !important;
+                        order: 4 !important;
                     }
                 }
                 @media (min-width: ' . ($mobile_breakpoint + 1) . 'px) {
