@@ -1,0 +1,108 @@
+.soda-reverse-columns-gallery {
+  display: grid;
+  /* default columns (inline style on the wrapper div will override repeat count) */
+  grid-template-columns: repeat(3, 1fr);
+  padding: 20px;
+  /* support separate row/column gaps via CSS variables set inline by the widget */
+  gap: var(--soda-grid-row-gap, 16px) var(--soda-grid-col-gap, 16px);
+  overflow-y: hidden;
+
+  view-timeline-name: --reverse-columns-image;
+  view-timeline-axis: block;
+  /* mask-image removed per request */
+}
+
+.soda-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--soda-item-row-gap, 16px);
+}
+
+.soda-reverse-columns-gallery .soda-column img {
+  width: 100%;
+  aspect-ratio: 1/1.5;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px;
+  display: block;
+}
+
+/* wrapper for each item (image + title) */
+.soda-reverse-columns-gallery .soda-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* overlay title container (positioned over image) */
+.soda-reverse-columns-gallery .soda-title-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+/* Title default styling (can be overridden by inline styles) */
+.soda-reverse-columns-gallery .soda-image-title {
+  margin: 0;
+  padding: 0;
+  font-weight: 600;
+  color: #313C59;
+  font-size: 18px;
+  display: block;
+}
+
+/* Title color variations based on custom field */
+.soda-reverse-columns-gallery .soda-image-title.title-dark {
+  color: #313C59;
+}
+
+.soda-reverse-columns-gallery .soda-image-title.title-light {
+  color: #ffffff;
+}
+
+/* hover zoom behavior — enabled when wrapper has .soda-hover-zoom
+   uses CSS variable --soda-zoom-scale set inline on the wrapper for widget-level control */
+.soda-reverse-columns-gallery .soda-hover-zoom img {
+  transition: transform 720ms cubic-bezier(.2,.8,.2,1);
+  transform-origin: center center;
+  will-change: transform;
+}
+.soda-reverse-columns-gallery .soda-hover-zoom img:hover {
+  transform: scale(var(--soda-zoom-scale, 1.08));
+}
+
+/* keep existing column-reverse animation logic */
+.soda-reverse-columns-gallery .soda-column-reverse {
+  --direction: reverse;
+  flex-direction: column-reverse;
+  transform: translateY(calc(-100% + 100vh));
+
+  /* Attach animation, linked to the View Timeline */
+  animation: linear adjust-position both;
+  animation-timeline: --reverse-columns-image;
+
+  /* Tweak range when effect should run*/
+  animation-range: contain;
+}
+
+@keyframes adjust-position {
+  from {
+    transform: translateY(calc(-100% + 100vh));
+  }
+
+  to {
+    transform: translateY(calc(100% - 100vh));
+  }
+}
+
+@keyframes move-to-right {
+  to {
+    transform: translateX(calc(-100% + var(--max-width)));
+  }
+}

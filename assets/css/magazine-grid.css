@@ -1,0 +1,368 @@
+/* ========================================
+   MAGAZINE GRID WIDGET STYLES
+   ======================================== */
+
+/* Base Grid Container */
+.post-magazine-grid {
+    display: grid;
+    grid-auto-flow: dense;
+    width: 100%;
+    position: relative;
+}
+
+/* Grid Item Base */
+.ue-grid-item {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+/* Image Container */
+.ue-grid-item-image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.ue-grid-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+/* Image Overlay */
+.ue-grid-item-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: block;
+}
+
+.ue-grid-item-image-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+/* Content Container */
+.ue-grid-item-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+/* Overlay Layout */
+.post-magazine-grid.ue-layout-cover .ue-grid-item {
+    position: relative;
+}
+
+.post-magazine-grid.ue-layout-cover .ue-grid-item-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.post-magazine-grid.ue-layout-cover .ue-grid-item-content {
+    position: relative;
+    height: 100%;
+    z-index: 3;
+}
+
+/* Below Layout */
+.post-magazine-grid.ue-layout-below .ue-grid-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-magazine-grid.ue-layout-below .ue-grid-item-image {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.post-magazine-grid.ue-layout-below .ue-grid-item-content {
+    flex: 1;
+    background: #fff;
+}
+
+/* Title Styles */
+.ue-grid-item-title {
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.ue-grid-item-title a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+    display: block;
+}
+
+/* Meta Data */
+.ue-grid-item-meta-data {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.ue-grid-item-meta-data span {
+    display: inline-block;
+}
+
+.ue-grid-item-meta-data span:not(:last-child)::after {
+    content: '•';
+    margin-left: 10px;
+    opacity: 0.6;
+}
+
+/* Excerpt */
+.ue-grid-item-excerpt {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+/* Button */
+.ue-grid-item-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.ue-grid-item-button .button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ue-grid-item-button .button-icon svg {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+}
+
+.ue-grid-item-button .button-text {
+    display: inline-block;
+}
+
+/* ========================================
+   HOVER EFFECTS
+   ======================================== */
+
+/* Zoom In Effect */
+.post-magazine-grid.hover-zoom .ue-grid-item:hover .ue-grid-item-image img {
+    transform: scale(1.1);
+}
+
+/* Zoom Out Effect */
+.post-magazine-grid.hover-zoom-out .ue-grid-item-image img {
+    transform: scale(1.1);
+}
+
+.post-magazine-grid.hover-zoom-out .ue-grid-item:hover .ue-grid-item-image img {
+    transform: scale(1);
+}
+
+/* Slide Up Effect */
+.post-magazine-grid.hover-slide-up .ue-grid-item-content {
+    transform: translateY(20px);
+}
+
+.post-magazine-grid.hover-slide-up .ue-grid-item:hover .ue-grid-item-content {
+    transform: translateY(0);
+}
+
+/* General Hover States */
+.ue-grid-item:hover {
+    transform: translateY(-2px);
+}
+
+.post-magazine-grid.ue-layout-cover .ue-grid-item:hover {
+    transform: none;
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .ue-grid-item-title {
+        font-size: 18px;
+    }
+    
+    .ue-grid-item-meta-data {
+        font-size: 13px;
+        gap: 8px;
+    }
+    
+    .ue-grid-item-excerpt {
+        font-size: 13px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .post-magazine-grid {
+        grid-auto-rows: 250px !important;
+    }
+    
+    .ue-grid-item-title {
+        font-size: 16px;
+    }
+    
+    .ue-grid-item-meta-data {
+        font-size: 12px;
+        gap: 6px;
+    }
+    
+    .ue-grid-item-meta-data span:not(:last-child)::after {
+        margin-left: 6px;
+    }
+    
+    .ue-grid-item-excerpt {
+        font-size: 12px;
+        display: none; /* Hide excerpts on mobile for better readability */
+    }
+    
+    /* Force all items to single column span on mobile for better UX */
+    .ue-grid-item {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+    .post-magazine-grid {
+        grid-auto-rows: 200px !important;
+    }
+    
+    .ue-grid-item-title {
+        font-size: 14px;
+    }
+    
+    .ue-grid-item-meta-data {
+        font-size: 11px;
+    }
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+
+.post-magazine-grid[data-loading="true"] .ue-grid-item {
+    opacity: 0;
+    animation: fadeInGrid 0.5s ease forwards;
+}
+
+.post-magazine-grid[data-loading="true"] .ue-grid-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.post-magazine-grid[data-loading="true"] .ue-grid-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.post-magazine-grid[data-loading="true"] .ue-grid-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.post-magazine-grid[data-loading="true"] .ue-grid-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.post-magazine-grid[data-loading="true"] .ue-grid-item:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.post-magazine-grid[data-loading="true"] .ue-grid-item:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+@keyframes fadeInGrid {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.ue-grid-item-image-overlay:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+.ue-grid-item-title a:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .ue-grid-item,
+    .ue-grid-item-image img,
+    .ue-grid-item-image-overlay::before,
+    .ue-grid-item-content,
+    .ue-grid-item-title a {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .post-magazine-grid[data-loading="true"] .ue-grid-item {
+        opacity: 1;
+        animation: none;
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .post-magazine-grid {
+        display: block;
+    }
+    
+    .ue-grid-item {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .ue-grid-item-image-overlay {
+        display: none;
+    }
+}

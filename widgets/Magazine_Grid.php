@@ -1,0 +1,1500 @@
+<?php
+namespace SodaAddons\Widgets;
+
+use Elementor\Widget_Base;
+use Elementor\Controls_Manager;
+use Elementor\Repeater;
+use Elementor\Group_Control_Typography;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Box_Shadow;
+use Elementor\Group_Control_Image_Size;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * Magazine Grid Widget
+ * 
+ * Displays posts and custom post types in a customizable magazine-style grid layout
+ * with individual control over column span and row span for each item.
+ */
+class Magazine_Grid extends Widget_Base {
+
+    public function get_name() {
+        return 'soda_magazine_grid';
+    }
+
+    public function get_title() {
+        return __('Magazine Grid', 'soda-elementor-addons');
+    }
+
+    public function get_icon() {
+        return 'eicon-gallery-grid';
+    }
+
+    public function get_categories() {
+        return ['soda-addons'];
+    }
+
+    public function get_script_depends() {
+        return ['soda-magazine-grid'];
+    }
+
+    public function get_style_depends() {
+        return ['soda-magazine-grid'];
+    }
+
+    protected function register_controls() {
+        
+        // ========== CONTENT SOURCE SECTION ==========
+        $this->start_controls_section(
+            'section_content_source',
+            [
+                'label' => __('Content Source', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        $this->add_control(
+            'content_source',
+            [
+                'label' => __('Source', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'posts' => __('Posts', 'soda-elementor-addons'),
+                    'custom' => __('Custom Items', 'soda-elementor-addons'),
+                ],
+                'default' => 'posts',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== CUSTOM ITEMS SECTION ==========
+        $this->start_controls_section(
+            'section_custom_items',
+            [
+                'label' => __('Custom Items', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+                'condition' => [
+                    'content_source' => 'custom',
+                ],
+            ]
+        );
+
+        $custom_repeater = new Repeater();
+
+        $custom_repeater->add_control(
+            'item_image',
+            [
+                'label' => __('Image', 'soda-elementor-addons'),
+                'type' => Controls_Manager::MEDIA,
+                'default' => [
+                    'url' => \Elementor\Utils::get_placeholder_image_src(),
+                ],
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'item_title',
+            [
+                'label' => __('Title', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXT,
+                'default' => __('Item Title', 'soda-elementor-addons'),
+                'label_block' => true,
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'item_link',
+            [
+                'label' => __('Link', 'soda-elementor-addons'),
+                'type' => Controls_Manager::URL,
+                'placeholder' => __('https://your-link.com', 'soda-elementor-addons'),
+                'default' => [
+                    'url' => '#',
+                ],
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'show_button',
+            [
+                'label' => __('Show Button', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'no',
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'button_text',
+            [
+                'label' => __('Button Text', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXT,
+                'default' => __('Read More', 'soda-elementor-addons'),
+                'condition' => [
+                    'show_button' => 'yes',
+                ],
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'button_icon',
+            [
+                'label' => __('Button Icon', 'soda-elementor-addons'),
+                'type' => Controls_Manager::ICONS,
+                'condition' => [
+                    'show_button' => 'yes',
+                ],
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'button_icon_position',
+            [
+                'label' => __('Icon Position', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'before' => __('Before', 'soda-elementor-addons'),
+                    'after' => __('After', 'soda-elementor-addons'),
+                ],
+                'default' => 'after',
+                'condition' => [
+                    'show_button' => 'yes',
+                ],
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'item_excerpt',
+            [
+                'label' => __('Excerpt', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXTAREA,
+                'rows' => 3,
+                'default' => '',
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'column_span',
+            [
+                'label' => __('Column Span', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 1,
+                'min' => 1,
+                'max' => 12,
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'row_span',
+            [
+                'label' => __('Row Span', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 1,
+                'min' => 1,
+                'max' => 10,
+            ]
+        );
+
+        $this->add_control(
+            'custom_items',
+            [
+                'label' => __('Items', 'soda-elementor-addons'),
+                'type' => Controls_Manager::REPEATER,
+                'fields' => $custom_repeater->get_controls(),
+                'default' => [
+                    [
+                        'item_title' => __('Item #1', 'soda-elementor-addons'),
+                        'column_span' => 2,
+                        'row_span' => 2,
+                    ],
+                    [
+                        'item_title' => __('Item #2', 'soda-elementor-addons'),
+                        'column_span' => 1,
+                        'row_span' => 1,
+                    ],
+                    [
+                        'item_title' => __('Item #3', 'soda-elementor-addons'),
+                        'column_span' => 1,
+                        'row_span' => 1,
+                    ],
+                    [
+                        'item_title' => __('Item #4', 'soda-elementor-addons'),
+                        'column_span' => 1,
+                        'row_span' => 1,
+                    ],
+                    [
+                        'item_title' => __('Item #5', 'soda-elementor-addons'),
+                        'column_span' => 1,
+                        'row_span' => 1,
+                    ],
+                    [
+                        'item_title' => __('Item #6', 'soda-elementor-addons'),
+                        'column_span' => 1,
+                        'row_span' => 1,
+                    ],
+                ],
+                'title_field' => '{{{ item_title }}} - Col: {{{ column_span }}} | Row: {{{ row_span }}}',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== GRID SETTINGS FOR CUSTOM ITEMS ==========
+        $this->start_controls_section(
+            'section_custom_grid_settings',
+            [
+                'label' => __('Grid Settings', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+                'condition' => [
+                    'content_source' => 'custom',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'custom_grid_columns',
+            [
+                'label' => __('Grid Columns', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 4,
+                'tablet_default' => 3,
+                'mobile_default' => 2,
+                'min' => 1,
+                'max' => 12,
+                'selectors' => [
+                    '{{WRAPPER}} .post-magazine-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'custom_grid_gap',
+            [
+                'label' => __('Grid Gap', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', 'rem'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 20,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .post-magazine-grid' => 'gap: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'custom_auto_rows',
+            [
+                'label' => __('Row Height', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'vh'],
+                'range' => [
+                    'px' => [
+                        'min' => 100,
+                        'max' => 800,
+                    ],
+                    'vh' => [
+                        'min' => 10,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 300,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .post-magazine-grid' => 'grid-auto-rows: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+        
+        // ========== QUERY SECTION ==========
+        $this->start_controls_section(
+            'section_query',
+            [
+                'label' => __('Query', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+                'condition' => [
+                    'content_source' => 'posts',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'post_type',
+            [
+                'label' => __('Post Type', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => $this->get_post_types(),
+                'default' => 'post',
+            ]
+        );
+
+        $this->add_control(
+            'posts_per_page',
+            [
+                'label' => __('Posts Per Page', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 6,
+                'min' => 1,
+                'max' => 100,
+            ]
+        );
+
+        $this->add_control(
+            'order_by',
+            [
+                'label' => __('Order By', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'date' => __('Date', 'soda-elementor-addons'),
+                    'title' => __('Title', 'soda-elementor-addons'),
+                    'modified' => __('Modified', 'soda-elementor-addons'),
+                    'rand' => __('Random', 'soda-elementor-addons'),
+                    'menu_order' => __('Menu Order', 'soda-elementor-addons'),
+                ],
+                'default' => 'date',
+            ]
+        );
+
+        $this->add_control(
+            'order',
+            [
+                'label' => __('Order', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'ASC' => __('Ascending', 'soda-elementor-addons'),
+                    'DESC' => __('Descending', 'soda-elementor-addons'),
+                ],
+                'default' => 'DESC',
+            ]
+        );
+
+        $this->add_control(
+            'exclude_current',
+            [
+                'label' => __('Exclude Current Post', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'only_featured_image',
+            [
+                'label' => __('Only Posts with Featured Image', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+                'description' => __('Show only posts that have a featured image set', 'soda-elementor-addons'),
+            ]
+        );
+
+        $this->add_control(
+            'hide_empty_title',
+            [
+                'label' => __('Hide Posts Without Title', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+                'description' => __('Hide posts with default titles like "Sin título", "Untitled", "(no title)", etc.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== GRID LAYOUT SECTION ==========
+        $this->start_controls_section(
+            'section_grid_layout',
+            [
+                'label' => __('Grid Layout', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+                'condition' => [
+                    'content_source' => 'posts',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'grid_columns',
+            [
+                'label' => __('Grid Columns', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 4,
+                'tablet_default' => 3,
+                'mobile_default' => 2,
+                'min' => 1,
+                'max' => 12,
+                'selectors' => [
+                    '{{WRAPPER}} .post-magazine-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'grid_gap',
+            [
+                'label' => __('Grid Gap', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', 'rem'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 20,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .post-magazine-grid' => 'gap: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'auto_rows',
+            [
+                'label' => __('Row Height', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'vh'],
+                'range' => [
+                    'px' => [
+                        'min' => 100,
+                        'max' => 800,
+                    ],
+                    'vh' => [
+                        'min' => 10,
+                        'max' => 100,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 300,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .post-magazine-grid' => 'grid-auto-rows: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $repeater = new Repeater();
+
+        $repeater->add_control(
+            'column_span',
+            [
+                'label' => __('Column Span', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 1,
+                'min' => 1,
+                'max' => 12,
+            ]
+        );
+
+        $repeater->add_control(
+            'row_span',
+            [
+                'label' => __('Row Span', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 1,
+                'min' => 1,
+                'max' => 10,
+            ]
+        );
+
+        $this->add_control(
+            'grid_items',
+            [
+                'label' => __('Grid Items Layout', 'soda-elementor-addons'),
+                'type' => Controls_Manager::REPEATER,
+                'fields' => $repeater->get_controls(),
+                'default' => [
+                    ['column_span' => 2, 'row_span' => 2],
+                    ['column_span' => 1, 'row_span' => 1],
+                    ['column_span' => 1, 'row_span' => 1],
+                    ['column_span' => 1, 'row_span' => 1],
+                    ['column_span' => 1, 'row_span' => 1],
+                    ['column_span' => 1, 'row_span' => 1],
+                ],
+                'title_field' => 'Col: {{{ column_span }}} | Row: {{{ row_span }}}',
+                'description' => __('Define column and row span for each post item. Pattern repeats if there are more posts than defined items.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== CONTENT SETTINGS SECTION ==========
+        $this->start_controls_section(
+            'section_content_settings',
+            [
+                'label' => __('Content Settings', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        $this->add_control(
+            'show_image',
+            [
+                'label' => __('Show Image', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Image_Size::get_type(),
+            [
+                'name' => 'image_size',
+                'default' => 'large',
+                'condition' => [
+                    'show_image' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'show_title',
+            [
+                'label' => __('Show Title', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'title_tag',
+            [
+                'label' => __('Title HTML Tag', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'h1' => 'H1',
+                    'h2' => 'H2',
+                    'h3' => 'H3',
+                    'h4' => 'H4',
+                    'h5' => 'H5',
+                    'h6' => 'H6',
+                    'div' => 'div',
+                ],
+                'default' => 'h3',
+                'condition' => [
+                    'show_title' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'show_excerpt',
+            [
+                'label' => __('Show Excerpt', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'excerpt_length',
+            [
+                'label' => __('Excerpt Length', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 20,
+                'min' => 5,
+                'max' => 100,
+                'condition' => [
+                    'show_excerpt' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'show_meta',
+            [
+                'label' => __('Show Meta Data', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'meta_items',
+            [
+                'label' => __('Meta Items', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT2,
+                'multiple' => true,
+                'options' => [
+                    'date' => __('Date', 'soda-elementor-addons'),
+                    'author' => __('Author', 'soda-elementor-addons'),
+                    'category' => __('Category', 'soda-elementor-addons'),
+                    'comments' => __('Comments', 'soda-elementor-addons'),
+                ],
+                'default' => ['date'],
+                'condition' => [
+                    'show_meta' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'content_position',
+            [
+                'label' => __('Content Position', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'overlay' => __('Overlay', 'soda-elementor-addons'),
+                    'below' => __('Below Image', 'soda-elementor-addons'),
+                ],
+                'default' => 'overlay',
+            ]
+        );
+
+        $this->add_control(
+            'content_alignment',
+            [
+                'label' => __('Content Alignment', 'soda-elementor-addons'),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'flex-start' => [
+                        'title' => __('Top', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-top',
+                    ],
+                    'center' => [
+                        'title' => __('Center', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-middle',
+                    ],
+                    'flex-end' => [
+                        'title' => __('Bottom', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-bottom',
+                    ],
+                ],
+                'default' => 'flex-end',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-content' => 'justify-content: {{VALUE}};',
+                ],
+                'condition' => [
+                    'content_position' => 'overlay',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== STYLE: GRID ITEM ==========
+        $this->start_controls_section(
+            'section_style_item',
+            [
+                'label' => __('Grid Item', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'item_border_radius',
+            [
+                'label' => __('Border Radius', 'soda-elementor-addons'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .ue-grid-item-image img' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'item_box_shadow',
+                'selector' => '{{WRAPPER}} .ue-grid-item',
+            ]
+        );
+
+        $this->add_control(
+            'item_hover_effect',
+            [
+                'label' => __('Hover Effect', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'none' => __('None', 'soda-elementor-addons'),
+                    'zoom' => __('Zoom In', 'soda-elementor-addons'),
+                    'zoom-out' => __('Zoom Out', 'soda-elementor-addons'),
+                    'slide-up' => __('Slide Up', 'soda-elementor-addons'),
+                ],
+                'default' => 'zoom',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== STYLE: IMAGE ==========
+        $this->start_controls_section(
+            'section_style_image',
+            [
+                'label' => __('Image', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'show_image' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'image_overlay_color',
+            [
+                'label' => __('Overlay Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => 'rgba(0,0,0,0.3)',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-image-overlay::before' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'image_overlay_hover_color',
+            [
+                'label' => __('Overlay Hover Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => 'rgba(0,0,0,0.5)',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item:hover .ue-grid-item-image-overlay::before' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== STYLE: CONTENT ==========
+        $this->start_controls_section(
+            'section_style_content',
+            [
+                'label' => __('Content', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'content_padding',
+            [
+                'label' => __('Padding', 'soda-elementor-addons'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', 'em', '%'],
+                'default' => [
+                    'top' => 20,
+                    'right' => 20,
+                    'bottom' => 20,
+                    'left' => 20,
+                    'unit' => 'px',
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'content_background',
+            [
+                'label' => __('Background', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-content' => 'background-color: {{VALUE}};',
+                ],
+                'condition' => [
+                    'content_position' => 'below',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== STYLE: TITLE ==========
+        $this->start_controls_section(
+            'section_style_title',
+            [
+                'label' => __('Title', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'show_title' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'title_typography',
+                'selector' => '{{WRAPPER}} .ue-grid-item-title a',
+            ]
+        );
+
+        $this->add_control(
+            'title_color',
+            [
+                'label' => __('Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-title a' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'title_hover_color',
+            [
+                'label' => __('Hover Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-title a:hover' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'title_spacing',
+            [
+                'label' => __('Spacing', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 50,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-title' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== STYLE: META ==========
+        $this->start_controls_section(
+            'section_style_meta',
+            [
+                'label' => __('Meta Data', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'show_meta' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'meta_typography',
+                'selector' => '{{WRAPPER}} .ue-grid-item-meta-data',
+            ]
+        );
+
+        $this->add_control(
+            'meta_color',
+            [
+                'label' => __('Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-meta-data' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'meta_spacing',
+            [
+                'label' => __('Spacing', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 50,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-meta-data' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== STYLE: EXCERPT ==========
+        $this->start_controls_section(
+            'section_style_excerpt',
+            [
+                'label' => __('Excerpt', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'show_excerpt' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'excerpt_typography',
+                'selector' => '{{WRAPPER}} .ue-grid-item-excerpt',
+            ]
+        );
+
+        $this->add_control(
+            'excerpt_color',
+            [
+                'label' => __('Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-excerpt' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // ========== STYLE: BUTTON ==========
+        $this->start_controls_section(
+            'section_style_button',
+            [
+                'label' => __('Button', 'soda-elementor-addons'),
+                'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'content_source' => 'custom',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'button_typography',
+                'selector' => '{{WRAPPER}} .ue-grid-item-button',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'button_padding',
+            [
+                'label' => __('Padding', 'soda-elementor-addons'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', 'em', '%'],
+                'default' => [
+                    'top' => 10,
+                    'right' => 20,
+                    'bottom' => 10,
+                    'left' => 20,
+                    'unit' => 'px',
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'button_spacing',
+            [
+                'label' => __('Spacing', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 50,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 15,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button' => 'margin-top: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'button_icon_spacing',
+            [
+                'label' => __('Icon Spacing', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 30,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 8,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button .button-icon-before' => 'margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .ue-grid-item-button .button-icon-after' => 'margin-left: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->start_controls_tabs('button_style_tabs');
+
+        // Normal Tab
+        $this->start_controls_tab(
+            'button_style_normal',
+            [
+                'label' => __('Normal', 'soda-elementor-addons'),
+            ]
+        );
+
+        $this->add_control(
+            'button_color',
+            [
+                'label' => __('Text Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'button_background',
+            [
+                'label' => __('Background', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#333333',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name' => 'button_border',
+                'selector' => '{{WRAPPER}} .ue-grid-item-button',
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        // Hover Tab
+        $this->start_controls_tab(
+            'button_style_hover',
+            [
+                'label' => __('Hover', 'soda-elementor-addons'),
+            ]
+        );
+
+        $this->add_control(
+            'button_hover_color',
+            [
+                'label' => __('Text Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button:hover' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'button_hover_background',
+            [
+                'label' => __('Background', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button:hover' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'button_hover_border_color',
+            [
+                'label' => __('Border Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button:hover' => 'border-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->end_controls_tabs();
+
+        $this->add_control(
+            'button_border_radius',
+            [
+                'label' => __('Border Radius', 'soda-elementor-addons'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'separator' => 'before',
+                'selectors' => [
+                    '{{WRAPPER}} .ue-grid-item-button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'button_box_shadow',
+                'selector' => '{{WRAPPER}} .ue-grid-item-button',
+            ]
+        );
+
+        $this->end_controls_section();
+    }
+
+    /**
+     * Get available post types
+     */
+    private function get_post_types() {
+        $post_types = get_post_types(['public' => true], 'objects');
+        $options = [];
+        
+        foreach ($post_types as $post_type) {
+            $options[$post_type->name] = $post_type->label;
+        }
+        
+        return $options;
+    }
+
+    /**
+     * Get custom excerpt
+     */
+    private function get_excerpt($length = 20) {
+        $excerpt = get_the_excerpt();
+        
+        if (empty($excerpt)) {
+            $excerpt = get_the_content();
+        }
+        
+        $excerpt = strip_tags($excerpt);
+        $excerpt = wp_trim_words($excerpt, $length, '...');
+        
+        return $excerpt;
+    }
+
+    /**
+     * Render widget output
+     */
+    protected function render() {
+        $settings = $this->get_settings_for_display();
+        
+        if ($settings['content_source'] === 'custom') {
+            $this->render_custom_items($settings);
+        } else {
+            $this->render_posts($settings);
+        }
+    }
+
+    /**
+     * Render custom items
+     */
+    private function render_custom_items($settings) {
+        $custom_items = $settings['custom_items'];
+        
+        if (empty($custom_items)) {
+            echo '<p>' . __('No items added.', 'soda-elementor-addons') . '</p>';
+            return;
+        }
+        
+        $widget_id = $this->get_id();
+        $content_position_class = $settings['content_position'] === 'overlay' ? 'ue-layout-cover' : 'ue-layout-below';
+        $hover_effect_class = 'hover-' . $settings['item_hover_effect'];
+        
+        ?>
+        <div id="uc_post_magazine_grid_elementor_<?php echo esc_attr($widget_id); ?>" 
+             class="post-magazine-grid <?php echo esc_attr($content_position_class); ?> <?php echo esc_attr($hover_effect_class); ?> ue-items-wrapper"
+             data-hover-effect="<?php echo esc_attr($settings['item_hover_effect']); ?>">
+            
+            <?php foreach ($custom_items as $index => $item) :
+                $col_span = isset($item['column_span']) ? $item['column_span'] : 1;
+                $row_span = isset($item['row_span']) ? $item['row_span'] : 1;
+                $grid_style = sprintf('grid-column: span %d; grid-row: span %d;', $col_span, $row_span);
+                
+                $link_url = !empty($item['item_link']['url']) ? $item['item_link']['url'] : '#';
+                $link_target = !empty($item['item_link']['is_external']) ? ' target="_blank"' : '';
+                $link_nofollow = !empty($item['item_link']['nofollow']) ? ' rel="nofollow"' : '';
+                ?>
+                
+                <div class="ue-grid-item" style="<?php echo esc_attr($grid_style); ?>">
+                    
+                    <?php if ($settings['show_image'] === 'yes' && !empty($item['item_image']['url'])) : ?>
+                        <div class="ue-grid-item-image">
+                            <?php
+                            $image_url = $item['item_image']['url'];
+                            $image_id = $item['item_image']['id'];
+                            
+                            if ($image_id) {
+                                $image_size = $settings['image_size_size'];
+                                if ($image_size === 'custom') {
+                                    $image_size = [
+                                        $settings['image_size_custom_dimension']['width'],
+                                        $settings['image_size_custom_dimension']['height']
+                                    ];
+                                }
+                                echo wp_get_attachment_image($image_id, $image_size, false, [
+                                    'loading' => $index === 0 ? false : 'lazy',
+                                    'decoding' => 'async',
+                                ]);
+                            } else {
+                                echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($item['item_title']) . '" ' . ($index === 0 ? '' : 'loading="lazy"') . ' decoding="async">';
+                            }
+                            ?>
+                            <a class="ue-grid-item-image-overlay" href="<?php echo esc_url($link_url); ?>"<?php echo $link_target . $link_nofollow; ?>></a>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="ue-grid-item-content">
+                        
+                        <?php if ($settings['show_title'] === 'yes' && !empty($item['item_title'])) : ?>
+                            <<?php echo esc_attr($settings['title_tag']); ?> class="ue-grid-item-title">
+                                <a href="<?php echo esc_url($link_url); ?>"<?php echo $link_target . $link_nofollow; ?>><?php echo esc_html($item['item_title']); ?></a>
+                            </<?php echo esc_attr($settings['title_tag']); ?>>
+                        <?php endif; ?>
+                        
+                        <?php if ($settings['show_excerpt'] === 'yes' && !empty($item['item_excerpt'])) : ?>
+                            <div class="ue-grid-item-excerpt">
+                                <?php echo esc_html($item['item_excerpt']); ?>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($item['show_button']) && $item['show_button'] === 'yes') : ?>
+                            <a href="<?php echo esc_url($link_url); ?>"<?php echo $link_target . $link_nofollow; ?> class="ue-grid-item-button">
+                                <?php
+                                // Icon before text
+                                if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'before') {
+                                    echo '<span class="button-icon button-icon-before">';
+                                    \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
+                                    echo '</span>';
+                                }
+                                
+                                // Button text
+                                if (!empty($item['button_text'])) {
+                                    echo '<span class="button-text">' . esc_html($item['button_text']) . '</span>';
+                                }
+                                
+                                // Icon after text
+                                if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'after') {
+                                    echo '<span class="button-icon button-icon-after">';
+                                    \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
+                                    echo '</span>';
+                                }
+                                ?>
+                            </a>
+                        <?php endif; ?>
+                        
+                    </div>
+                    
+                </div>
+                
+            <?php endforeach; ?>
+            
+        </div>
+        <?php
+    }
+
+    /**
+     * Render posts from query
+     */
+    private function render_posts($settings) {
+        
+        // Query args
+        // Request more posts than needed to account for filtering
+        $requested_posts = $settings['posts_per_page'];
+        $query_posts = ($settings['hide_empty_title'] === 'yes' || $settings['only_featured_image'] === 'yes') 
+            ? $requested_posts * 3 
+            : $requested_posts;
+        
+        $args = [
+            'post_type' => $settings['post_type'],
+            'posts_per_page' => $query_posts,
+            'orderby' => $settings['order_by'],
+            'order' => $settings['order'],
+            'post_status' => 'publish',
+        ];
+        
+        // Exclude current post
+        if ($settings['exclude_current'] === 'yes' && is_singular()) {
+            $args['post__not_in'] = [get_the_ID()];
+        }
+        
+        // Only posts with featured image (pre-filter in query)
+        if ($settings['only_featured_image'] === 'yes') {
+            $args['meta_query'] = [
+                [
+                    'key' => '_thumbnail_id',
+                    'compare' => 'EXISTS',
+                ],
+            ];
+        }
+        
+        $query = new \WP_Query($args);
+        
+        if (!$query->have_posts()) {
+            echo '<p>' . __('No posts found.', 'soda-elementor-addons') . '</p>';
+            return;
+        }
+        
+        // Get grid items layout
+        $grid_items = $settings['grid_items'];
+        $grid_items_count = count($grid_items);
+        
+        $widget_id = $this->get_id();
+        $content_position_class = $settings['content_position'] === 'overlay' ? 'ue-layout-cover' : 'ue-layout-below';
+        $hover_effect_class = 'hover-' . $settings['item_hover_effect'];
+        
+        ?>
+        <div id="uc_post_magazine_grid_elementor_<?php echo esc_attr($widget_id); ?>" 
+             class="post-magazine-grid <?php echo esc_attr($content_position_class); ?> <?php echo esc_attr($hover_effect_class); ?> ue-items-wrapper"
+             data-hover-effect="<?php echo esc_attr($settings['item_hover_effect']); ?>">
+            
+            <?php
+            $counter = 0;
+            $displayed_items = 0;
+            $max_items = $settings['posts_per_page'];
+            
+            while ($query->have_posts() && $displayed_items < $max_items) {
+                $query->the_post();
+                
+                // Skip posts without featured image if option is enabled
+                if ($settings['show_image'] === 'yes' && $settings['only_featured_image'] === 'yes' && !has_post_thumbnail()) {
+                    continue;
+                }
+                
+                // Skip posts with empty/default titles if option is enabled
+                if ($settings['hide_empty_title'] === 'yes') {
+                    $post_title = trim(get_the_title());
+                    $empty_titles = ['sin título', 'sin titulo', 'untitled', '(no title)', 'auto draft', ''];
+                    
+                    if (empty($post_title) || in_array(strtolower($post_title), $empty_titles)) {
+                        continue;
+                    }
+                }
+                
+                // Get current grid item layout (cycle through if more posts than defined items)
+                $current_layout = $grid_items[$displayed_items % $grid_items_count];
+                $col_span = isset($current_layout['column_span']) ? $current_layout['column_span'] : 1;
+                $row_span = isset($current_layout['row_span']) ? $current_layout['row_span'] : 1;
+                
+                $grid_style = sprintf('grid-column: span %d; grid-row: span %d;', $col_span, $row_span);
+                
+                ?>
+                <div class="ue-grid-item" style="<?php echo esc_attr($grid_style); ?>">
+                    
+                    <?php if ($settings['show_image'] === 'yes' && has_post_thumbnail()) : ?>
+                        <div class="ue-grid-item-image">
+                            <?php
+                            $image_size = $settings['image_size_size'];
+                            if ($image_size === 'custom') {
+                                $image_size = [
+                                    $settings['image_size_custom_dimension']['width'],
+                                    $settings['image_size_custom_dimension']['height']
+                                ];
+                            }
+                            
+                            echo get_the_post_thumbnail(get_the_ID(), $image_size, [
+                                'loading' => $counter === 0 ? false : 'lazy',
+                                'decoding' => 'async',
+                            ]);
+                            ?>
+                            <a class="ue-grid-item-image-overlay" href="<?php the_permalink(); ?>"></a>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="ue-grid-item-content">
+                        
+                        <?php if ($settings['show_meta'] === 'yes' && !empty($settings['meta_items'])) : ?>
+                            <div class="ue-grid-item-meta-data">
+                                <?php
+                                foreach ($settings['meta_items'] as $meta_item) {
+                                    switch ($meta_item) {
+                                        case 'date':
+                                            echo '<span class="meta-date">' . get_the_date() . '</span>';
+                                            break;
+                                        case 'author':
+                                            echo '<span class="meta-author">' . get_the_author() . '</span>';
+                                            break;
+                                        case 'category':
+                                            $categories = get_the_category();
+                                            if (!empty($categories)) {
+                                                echo '<span class="meta-category">' . esc_html($categories[0]->name) . '</span>';
+                                            }
+                                            break;
+                                        case 'comments':
+                                            echo '<span class="meta-comments">' . get_comments_number() . ' ' . __('Comments', 'soda-elementor-addons') . '</span>';
+                                            break;
+                                    }
+                                }
+                                ?>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if ($settings['show_title'] === 'yes') : ?>
+                            <<?php echo esc_attr($settings['title_tag']); ?> class="ue-grid-item-title">
+                                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                            </<?php echo esc_attr($settings['title_tag']); ?>>
+                        <?php endif; ?>
+                        
+                        <?php if ($settings['show_excerpt'] === 'yes') : ?>
+                            <div class="ue-grid-item-excerpt">
+                                <?php echo esc_html($this->get_excerpt($settings['excerpt_length'])); ?>
+                            </div>
+                        <?php endif; ?>
+                        
+                    </div>
+                    
+                </div>
+                <?php
+                $displayed_items++;
+            }
+            wp_reset_postdata();
+            ?>
+            
+        </div>
+        <?php
+    }
+}

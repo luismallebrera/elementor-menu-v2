@@ -1,0 +1,70 @@
+.soda-liquid-glass-preset1 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 6px)) url(#glass-distortion-1);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 6px)) url(#glass-distortion-1)
+}
+
+.soda-liquid-glass-preset2 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 8px)) url(#glass-distortion-2);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 8px)) url(#glass-distortion-2)
+}
+
+.soda-liquid-glass-preset3 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 10px)) url(#glass-distortion-3);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 10px)) url(#glass-distortion-3)
+}
+
+.soda-liquid-glass-preset4 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 24px)) url(#glass-distortion-4);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 24px)) url(#glass-distortion-4)
+}
+
+.soda-liquid-glass-preset5 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 12px)) url(#glass-distortion-5);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 12px)) url(#glass-distortion-5)
+}
+
+.soda-liquid-glass-preset6 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 18px)) url(#glass-distortion-6);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 18px)) url(#glass-distortion-6)
+}
+
+.soda-liquid-glass-preset7 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 16px)) url(#glass-distortion-7);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 16px)) url(#glass-distortion-7)
+}
+
+.soda-liquid-glass-preset8 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 9px)) url(#glass-distortion-8);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 9px)) url(#glass-distortion-8)
+}
+
+.soda-liquid-glass-preset9 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 14px)) url(#glass-distortion-9);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 14px)) url(#glass-distortion-9)
+}
+
+.soda-liquid-glass-preset10 {
+    backdrop-filter: blur(var(--soda-liquid-glass-blur, 20px)) url(#glass-distortion-10);
+    -webkit-backdrop-filter: blur(var(--soda-liquid-glass-blur, 20px)) url(#glass-distortion-10)
+}
+.soda-liquid-glass-preset11 {
+  backdrop-filter: blur(var(--soda-liquid-glass-blur, 9px));
+}
+
+.soda-liquid-glass-preset12 {
+  backdrop-filter: blur(var(--soda-liquid-glass-blur, 9px));
+}
+
+
+    .soda-liquid-glass-preset12::before {
+      content: '';
+        filter: url(#soda-glass-distortion1);
+    }
+    .soda-liquid-glass-preset11::before {
+      content: '';
+        filter: url(#soda-glass-distortion2);
+    }
+    .soda-liquid-glass-preset13::before {
+      content: '';
+        filter: url(#soda-glass-distortion3);
+    }

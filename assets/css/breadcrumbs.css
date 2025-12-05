@@ -1,0 +1,52 @@
+/* ========================================
+   BREADCRUMBS WIDGET STYLES
+   ======================================== */
+
+.soda-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    line-height: 1;
+}
+
+.soda-breadcrumbs .breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+}
+
+.soda-breadcrumbs .breadcrumb-item a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.soda-breadcrumbs .breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.soda-breadcrumbs .breadcrumb-item.current {
+    font-weight: 600;
+}
+
+.soda-breadcrumbs .breadcrumb-separator {
+    display: inline-flex;
+    align-items: center;
+}
+
+.soda-breadcrumbs .breadcrumb-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.soda-breadcrumbs .breadcrumb-icon svg {
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .soda-breadcrumbs {
+        font-size: 14px;
+    }
+}

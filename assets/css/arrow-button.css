@@ -1,0 +1,109 @@
+.elementor-widget-soda-arrow-button .soda-arrow-button {
+    white-space: wrap;
+    text-decoration: unset !important;
+    
+    width: fit-content;
+    height: fit-content;
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button:not(:has(> a)),
+.elementor-widget-soda-arrow-button .soda-arrow-button > a {
+    cursor: pointer;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button .soda-arrow-button__anchor {
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    
+    color: currentColor !important;
+    text-decoration: unset;
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button .soda-arrow-button_title-wrapper {
+    width: 100%;
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button .soda-arrow-button_title-wrap {
+    position: relative;
+    overflow: hidden;
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button .soda-arrow-button__title {
+    display: block;
+    outline: none;
+    border: none;
+    
+    transition: transform;
+    transition-duration: var(--transitiondurationswap);
+    transition-timing-function: var(--easeswap);
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button[data-swap='enable'] .soda-arrow-button__title::after {
+    display: block;
+    content: attr(data-content);
+    
+    position: absolute;
+    top: 100%;
+    
+    width: 100%;
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button[data-swap='enable']:hover .soda-arrow-button__title {
+    transform: translateY(-100%);
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button[data-swap='enable']:hover .soda-arrow-button__title::after {
+    transform: translateY(0%);
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button .soda-arrow-button__circle {
+    position: relative;
+    overflow: hidden;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    min-width: var(--dimensions) !important;
+    min-height: var(--dimensions) !important;
+    
+    transition: scale;
+    transition-duration: var(--transitionduration);
+    transition-timing-function: var(--ease);
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button .soda-arrow-button__arrow {
+    position: absolute;
+    transition: transform;
+    transition-duration: var(--transitionduration);
+    transition-timing-function: var(--ease);
+    
+    min-width: var(--dimensions) !important;
+    min-height: var(--dimensions) !important;
+    max-width: var(--dimensions) !important;
+    max-height: var(--dimensions) !important;
+    
+    stroke: var(--fill);
+    fill: var(--fill);
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button .soda-arrow-button__arrow-right {
+    transform: translateX(calc(var(--arrow-distance) * -1));
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button:hover .soda-arrow-button__circle {
+    scale: var(--scale);
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button:hover .soda-arrow-button__arrow-left {
+    transform: translateX(var(--arrow-distance));
+}
+
+.elementor-widget-soda-arrow-button .soda-arrow-button:hover .soda-arrow-button__arrow-right {
+    transform: translateX(0%);
+}

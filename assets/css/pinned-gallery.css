@@ -1,0 +1,25 @@
+
+/*--------------------------------------------------
+    Pinned Gallery CSS
+---------------------------------------------------*/
+
+.pinned-image {
+    box-sizing: border-box;
+    padding-bottom: 300px;
+    position: relative;
+}
+.pinned-image:first-child {
+    padding-top: 0;
+}
+.pinned-image:last-child {
+    z-index: 10;
+    padding-bottom: 0px;
+}
+.rounded-borders .pinned-image img {
+    border-radius: 8px;
+}
+
+.pinned-gallery > div.pinned-image {
+    align-items: center;
+    display: flex;
+}

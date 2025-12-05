@@ -1,0 +1,73 @@
+/* Estilos para botón toggle y panel de filtros flotante - v3.3.0 */
+
+/* Botón toggle FILTRO */
+.cbp-filter-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.cbp-filter-toggle-btn:hover {
+    transform: translateX(-50%) scale(1.1);
+}
+
+/* Panel de filtros */
+.cbp-filters-wrapper {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9998;
+    overflow: hidden;
+    min-width: 200px;
+    visibility: hidden;
+    transition: visibility 0s 0.8s;
+}
+
+/* Remove margins when toggle is active */
+.has-filter-toggle .cbp-l-filters-button .cbp-filter-item {
+    margin: 0px;
+}
+
+.cbp-filters-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: 0.8s cubic-bezier(0.1, 0.7, 0.5, 1) 0.3s;
+    background-color: #FFFFFFA8;
+    border-radius: 4px 4px 4px 4px;
+    transform: scaleY(0);
+    transform-origin: bottom;
+}
+
+.cbp-filters-wrapper.active {
+    visibility: visible;
+    transition: visibility 0s 0s;
+}
+
+.cbp-filters-wrapper.active::before {
+    transform: scaleY(1);
+    transition: 0.8s cubic-bezier(0.1, 0.7, 0.5, 1) 0s;
+}
+
+.cbp-filters-wrapper .cbp-l-filters-button {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.5s 0s;
+}
+
+.cbp-filters-wrapper.active .cbp-l-filters-button {
+    opacity: 1;
+    transition: opacity 0.5s 0.6s;
+}

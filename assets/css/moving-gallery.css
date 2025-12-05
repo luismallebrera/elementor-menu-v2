@@ -1,0 +1,74 @@
+/*--------------------------------------------------
+    Moving Gallery CSS
+---------------------------------------------------*/
+
+.fw-gallery .wrapper-gallery {
+    display: inline-flex;
+    align-items: flex-end;
+    margin:0;
+    padding:0;
+    clear:both;
+}
+
+.bw-gallery .wrapper-gallery {
+    display: inline-flex;
+    align-items: flex-start;
+    margin:0;
+    padding:0;
+}
+
+.moving-gallery li {
+    position:relative;
+    width: 25vw;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing:border-box;
+    margin:10px 0;
+    list-style:none;
+}
+
+.fw-gallery.random-sizes li:first-child, .bw-gallery.random-sizes li:first-child {
+    padding-left: 0px;
+}
+
+.fw-gallery.random-sizes li:last-child, .bw-gallery.random-sizes li:last-child {
+    padding-right: 0px;
+}
+
+.fw-gallery.random-sizes li:nth-child(1) { width: 25vw; }
+.fw-gallery.random-sizes li:nth-child(2) { width: 30vw; }
+.fw-gallery.random-sizes li:nth-child(3) { width: 45vw; }
+.fw-gallery.random-sizes li:nth-child(4) { width: 25vw; }
+
+.bw-gallery.random-sizes li:nth-child(1) { width: 25vw; }
+.bw-gallery.random-sizes li:nth-child(2) { width: 45vw; }
+.bw-gallery.random-sizes li:nth-child(3) { width:30vw; }
+.bw-gallery.random-sizes li:nth-child(4) { width: 25vw; }
+
+.moving-gallery li img {
+    height:auto;
+    margin:0px;
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.rounded-borders .moving-gallery li img {
+    border-radius:12px;
+}
+
+.moving-gallery-caption {
+    position: absolute;
+    height: auto;
+    padding: 30px;
+    box-sizing: border-box;
+    text-align: center;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity:0;
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
+}
+
+.moving-gallery li:hover .moving-gallery-caption {
+    opacity:0.4;
+}
