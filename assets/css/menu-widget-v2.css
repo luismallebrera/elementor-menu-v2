@@ -786,7 +786,7 @@ nav.vertical-menu .menu .menu-item::after {
 
 .menu-widget-container.layout-logo-left-nav-right-button-right .action-button-wrapper {
     flex-shrink: 0;
-    margin-left: 20px;
+    margin-left: 0;
 }
 
 /* Action Button Wrapper */
