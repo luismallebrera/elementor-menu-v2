@@ -117,23 +117,6 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
-            'layout_type',
-            [
-                'label' => esc_html__('Layout', 'elementor-menu-widget-v2'),
-                'type' => \Elementor\Controls_Manager::SELECT,
-                'options' => [
-                    'logo-left-nav-center-button-right' => esc_html__('Logo Left | Nav Center | Button Right', 'elementor-menu-widget-v2'),
-                    'logo-left-nav-right-button-right' => esc_html__('Logo Left | Nav Right | Button Right', 'elementor-menu-widget-v2'),
-                ],
-                'default' => 'logo-left-nav-center-button-right',
-                'condition' => [
-                    'menu_type' => ['horizontal', 'toggle-on-scroll'],
-                ],
-                'separator' => 'before',
-            ]
-        );
-
-        $this->add_control(
             'menu_open_text',
             [
                 'label' => esc_html__('Open Text', 'elementor-menu-widget-v2'),
@@ -228,6 +211,22 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'options' => $menu_options,
                 'default' => !empty($menu_options) ? array_key_first($menu_options) : '',
                 'description' => esc_html__('Select a WordPress menu for horizontal display', 'elementor-menu-widget-v2'),
+                'condition' => [
+                    'menu_type' => ['horizontal', 'toggle-on-scroll'],
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'layout_type',
+            [
+                'label' => esc_html__('Layout', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    'logo-left-nav-center-button-right' => esc_html__('Logo Left | Nav Center | Button Right', 'elementor-menu-widget-v2'),
+                    'logo-left-nav-right-button-right' => esc_html__('Logo Left | Nav Right | Button Right', 'elementor-menu-widget-v2'),
+                ],
+                'default' => 'logo-left-nav-center-button-right',
                 'condition' => [
                     'menu_type' => ['horizontal', 'toggle-on-scroll'],
                 ],
