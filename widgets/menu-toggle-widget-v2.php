@@ -2174,7 +2174,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 ],
                 'default' => [
                     'unit' => 'px',
-                    'size' => 100,
+                    'size' => 0,
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .action-button-wrapper' => 'margin-right: {{SIZE}}{{UNIT}};',
