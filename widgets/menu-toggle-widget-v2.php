@@ -3832,6 +3832,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
         
         // Add inline style for custom breakpoint (horizontal with mobile toggle)
         if ($enable_mobile_toggle && $menu_type === 'horizontal') {
+            $layout_type = !empty($settings['layout_type']) ? $settings['layout_type'] : 'logo-left-nav-center-button-right';
             echo '<style>
                 @media (max-width: ' . esc_attr($mobile_breakpoint) . 'px) {
                     .elementor-element-' . $this->get_id() . ' .horizontal-menu-nav.hide-on-mobile {
@@ -3839,6 +3840,21 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                     }
                     .elementor-element-' . $this->get_id() . ' .site-navigation-toggle-holder.show-on-mobile {
                         display: inline-block !important;
+                    }
+                    /* Mobile layout adjustments */
+                    .elementor-element-' . $this->get_id() . ' .menu-main-container {
+                        display: flex !important;
+                        justify-content: space-between !important;
+                    }
+                    .elementor-element-' . $this->get_id() . ' .menu-logo {
+                        flex-shrink: 0 !important;
+                    }
+                    .elementor-element-' . $this->get_id() . ' .site-navigation-toggle-holder.show-on-mobile {
+                        margin-left: auto !important;
+                    }
+                    .elementor-element-' . $this->get_id() . ' .action-button-wrapper {
+                        flex-shrink: 0 !important;
+                        margin-left: 15px !important;
                     }
                 }
                 @media (min-width: ' . ($mobile_breakpoint + 1) . 'px) {
