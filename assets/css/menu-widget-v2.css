@@ -377,27 +377,6 @@ nav.vertical-menu .menu .menu-item::after {
     transform: translateY(-5px) rotate(-45deg);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .menu-text {
-        font-size: 12px;
-    }
-    
-    .hamburger {
-        width: 25px;
-        height: 25px;
-        gap: 4px;
-    }
-    
-    .site-navigation-toggle.toggled .hamburger .line:nth-child(1) {
-        transform: translateY(6px) rotate(45deg);
-    }
-    
-    .site-navigation-toggle.toggled .hamburger .line:nth-child(3) {
-        transform: translateY(-6px) rotate(-45deg);
-    }
-}
-
 /* Menu Container */
 .menu-container {
     position: absolute;
