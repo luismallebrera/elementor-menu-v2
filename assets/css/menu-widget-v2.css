@@ -710,14 +710,16 @@ nav.vertical-menu .menu .menu-item::after {
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
     z-index: 1000;
+    pointer-events: none;
 }
 
 .action-button-panel.active {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    pointer-events: auto;
 }
 
 .action-button-panel-menu ul {
