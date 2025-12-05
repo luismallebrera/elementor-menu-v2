@@ -117,6 +117,23 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
+            'layout_type',
+            [
+                'label' => esc_html__('Layout', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    'logo-left-nav-center-button-right' => esc_html__('Logo Left | Nav Center | Button Right', 'elementor-menu-widget-v2'),
+                    'logo-left-nav-right-button-right' => esc_html__('Logo Left | Nav Right | Button Right', 'elementor-menu-widget-v2'),
+                ],
+                'default' => 'logo-left-nav-center-button-right',
+                'condition' => [
+                    'menu_type' => ['horizontal', 'toggle-on-scroll'],
+                ],
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
             'menu_open_text',
             [
                 'label' => esc_html__('Open Text', 'elementor-menu-widget-v2'),
@@ -1927,8 +1944,8 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                     'size' => 8,
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a .action-button-icon-before' => 'margin-right: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a .action-button-icon-after' => 'margin-left: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button .action-button-icon-before' => 'margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button .action-button-icon-after' => 'margin-left: {{SIZE}}{{UNIT}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -1941,7 +1958,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name' => 'action_button_typography',
-                'selector' => '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a',
+                'selector' => '{{WRAPPER}} .action-button-wrapper .action-button',
                 'condition' => [
                     'enable_action_button' => 'yes',
                 ],
@@ -1966,9 +1983,9 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'label' => esc_html__('Text Color', 'elementor-menu-widget-v2'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a i' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a svg' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button i' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button svg' => 'fill: {{VALUE}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -1982,7 +1999,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'label' => esc_html__('Background Color', 'elementor-menu-widget-v2'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button' => 'background-color: {{VALUE}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -2008,9 +2025,9 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'label' => esc_html__('Text Color', 'elementor-menu-widget-v2'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a:hover' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a:hover i' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a:hover svg' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button:hover' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button:hover i' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button:hover svg' => 'fill: {{VALUE}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -2024,7 +2041,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'label' => esc_html__('Background Color', 'elementor-menu-widget-v2'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a:hover' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button:hover' => 'background-color: {{VALUE}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -2050,9 +2067,9 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'label' => esc_html__('Text Color', 'elementor-menu-widget-v2'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .menu-widget-container.sticky .horizontal-menu-nav .menu > li.action-button > a' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .menu-widget-container.sticky .horizontal-menu-nav .menu > li.action-button > a i' => 'color: {{VALUE}};',
-                    '{{WRAPPER}} .menu-widget-container.sticky .horizontal-menu-nav .menu > li.action-button > a svg' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .menu-widget-container.sticky .action-button-wrapper .action-button' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .menu-widget-container.sticky .action-button-wrapper .action-button i' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .menu-widget-container.sticky .action-button-wrapper .action-button svg' => 'fill: {{VALUE}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -2066,7 +2083,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'label' => esc_html__('Background Color', 'elementor-menu-widget-v2'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .menu-widget-container.sticky .horizontal-menu-nav .menu > li.action-button > a' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .menu-widget-container.sticky .action-button-wrapper .action-button' => 'background-color: {{VALUE}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -2085,7 +2102,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'type' => \Elementor\Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', 'rem'],
                 'selectors' => [
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
                 'separator' => 'before',
                 'condition' => [
@@ -2099,7 +2116,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
             [
                 'name' => 'action_button_border',
                 'label' => esc_html__('Border', 'elementor-menu-widget-v2'),
-                'selector' => '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a',
+                'selector' => '{{WRAPPER}} .action-button-wrapper .action-button',
                 'condition' => [
                     'enable_action_button' => 'yes',
                 ],
@@ -2113,7 +2130,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 'type' => \Elementor\Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em', 'rem'],
                 'selectors' => [
-                    '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .action-button-wrapper .action-button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
                 'condition' => [
                     'enable_action_button' => 'yes',
@@ -2126,7 +2143,7 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
             [
                 'name' => 'action_button_box_shadow',
                 'label' => esc_html__('Box Shadow', 'elementor-menu-widget-v2'),
-                'selector' => '{{WRAPPER}} .horizontal-menu-nav .menu > li.action-button > a',
+                'selector' => '{{WRAPPER}} .action-button-wrapper .action-button',
                 'condition' => [
                     'enable_action_button' => 'yes',
                 ],
@@ -3846,8 +3863,12 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
         
         // Menu type class
         $menu_type_class = 'menu-type-' . esc_attr($menu_type);
+        
+        // Layout class
+        $layout_type = !empty($settings['layout_type']) ? $settings['layout_type'] : 'logo-left-nav-center-button-right';
+        $layout_class = 'layout-' . esc_attr($layout_type);
         ?>
-        <div class="menu-widget-container <?php echo esc_attr($position_class); ?> <?php echo esc_attr($menu_type_class); ?>"<?php echo $data_attrs; ?>>
+        <div class="menu-widget-container <?php echo esc_attr($position_class); ?> <?php echo esc_attr($menu_type_class); ?> <?php echo esc_attr($layout_class); ?>"<?php echo $data_attrs; ?>>
             <div class="menu-main-container">
                 <?php if ($show_logo && !empty($settings['logo_image']['url'])) : 
                     $enable_sticky_logo = isset($settings['enable_sticky_logo']) && $settings['enable_sticky_logo'] === 'yes';
@@ -3922,33 +3943,35 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                         'menu_class' => 'menu',
                         'fallback_cb' => false,
                     ]);
-                    
-                    // Render action button as separate element
-                    if ($enable_action_button) :
-                        $button_text = $settings['action_button_text'] ?? 'Get Started';
-                        $button_link = $settings['action_button_link']['url'] ?? '#';
-                        $button_target = !empty($settings['action_button_link']['is_external']) ? ' target="_blank"' : '';
-                        $button_nofollow = !empty($settings['action_button_link']['nofollow']) ? ' rel="nofollow"' : '';
-                        $icon_position = $settings['action_button_icon_position'] ?? 'before';
-                        $has_icon = !empty($settings['action_button_icon']['value']);
                     ?>
-                        <li class="menu-item action-button">
-                            <a href="<?php echo esc_url($button_link); ?>"<?php echo $button_target . $button_nofollow; ?>>
-                                <?php if ($has_icon && $icon_position === 'before') : ?>
-                                    <span class="action-button-icon-before">
-                                        <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
-                                    </span>
-                                <?php endif; ?>
-                                <span><?php echo esc_html($button_text); ?></span>
-                                <?php if ($has_icon && $icon_position === 'after') : ?>
-                                    <span class="action-button-icon-after">
-                                        <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
-                                    </span>
-                                <?php endif; ?>
-                            </a>
-                        </li>
-                    <?php endif; ?>
                 </nav>
+                
+                <?php
+                // Render action button as separate element outside the menu
+                if ($enable_action_button) :
+                    $button_text = $settings['action_button_text'] ?? 'Get Started';
+                    $button_link = $settings['action_button_link']['url'] ?? '#';
+                    $button_target = !empty($settings['action_button_link']['is_external']) ? ' target="_blank"' : '';
+                    $button_nofollow = !empty($settings['action_button_link']['nofollow']) ? ' rel="nofollow"' : '';
+                    $icon_position = $settings['action_button_icon_position'] ?? 'before';
+                    $has_icon = !empty($settings['action_button_icon']['value']);
+                ?>
+                    <div class="action-button-wrapper">
+                        <a href="<?php echo esc_url($button_link); ?>" class="action-button"<?php echo $button_target . $button_nofollow; ?>>
+                            <?php if ($has_icon && $icon_position === 'before') : ?>
+                                <span class="action-button-icon-before">
+                                    <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
+                                </span>
+                            <?php endif; ?>
+                            <span><?php echo esc_html($button_text); ?></span>
+                            <?php if ($has_icon && $icon_position === 'after') : ?>
+                                <span class="action-button-icon-after">
+                                    <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
                 
                 <?php 
                 // Show toggle button for horizontal with mobile toggle OR toggle-on-scroll

@@ -676,3 +676,64 @@ nav.vertical-menu .menu .menu-item::after {
     display: none;
 }
 
+/* Layout Styles */
+/* Logo Left | Nav Center | Button Right */
+.menu-widget-container.layout-logo-left-nav-center-button-right .menu-main-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+}
+
+.menu-widget-container.layout-logo-left-nav-center-button-right .menu-logo {
+    justify-self: start;
+}
+
+.menu-widget-container.layout-logo-left-nav-center-button-right .horizontal-menu-nav {
+    justify-self: center;
+}
+
+.menu-widget-container.layout-logo-left-nav-center-button-right .action-button-wrapper {
+    justify-self: end;
+}
+
+/* Logo Left | Nav Right | Button Right */
+.menu-widget-container.layout-logo-left-nav-right-button-right .menu-main-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.menu-widget-container.layout-logo-left-nav-right-button-right .menu-logo {
+    flex-shrink: 0;
+}
+
+.menu-widget-container.layout-logo-left-nav-right-button-right .horizontal-menu-nav {
+    margin-left: auto;
+}
+
+.menu-widget-container.layout-logo-left-nav-right-button-right .action-button-wrapper {
+    flex-shrink: 0;
+}
+
+/* Action Button Wrapper */
+.action-button-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.action-button-wrapper .action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.action-button-wrapper .action-button-icon-before,
+.action-button-wrapper .action-button-icon-after {
+    display: inline-flex;
+    align-items: center;
+}
+
