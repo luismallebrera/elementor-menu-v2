@@ -21,15 +21,35 @@
         var $actionPanel = $scope.find('.action-button-panel');
         
         if ($actionButton.length && $actionPanel.length) {
+            // Toggle panel on button click
             $actionButton.on('click', function(e) {
                 e.preventDefault();
-                $actionPanel.toggleClass('active');
-                $actionButton.toggleClass('active');
+                e.stopPropagation();
+                
+                var isActive = $actionPanel.hasClass('active');
+                
+                // Close all other panels first
+                $('.action-button-panel').removeClass('active');
+                $('.action-button[data-behavior="panel"]').removeClass('active');
+                
+                // Toggle current panel
+                if (!isActive) {
+                    $actionPanel.addClass('active');
+                    $(this).addClass('active');
+                }
             });
             
             // Close panel when clicking outside
-            $(document).on('click', function(e) {
+            $(document).on('click.actionPanel', function(e) {
                 if (!$(e.target).closest('.action-button-wrapper').length) {
+                    $actionPanel.removeClass('active');
+                    $actionButton.removeClass('active');
+                }
+            });
+            
+            // Close panel on ESC key
+            $(document).on('keydown.actionPanel', function(e) {
+                if (e.key === 'Escape' || e.keyCode === 27) {
                     $actionPanel.removeClass('active');
                     $actionButton.removeClass('active');
                 }

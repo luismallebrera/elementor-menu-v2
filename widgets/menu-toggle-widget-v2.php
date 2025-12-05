@@ -2252,6 +2252,239 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
 
         $this->end_controls_section();
 
+        // Action Button Panel Style Section
+        $this->start_controls_section(
+            'action_button_panel_section',
+            [
+                'label' => esc_html__('Action Button Panel', 'elementor-menu-widget-v2'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'enable_action_button' => 'yes',
+                    'action_button_behavior' => 'panel',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'panel_width',
+            [
+                'label' => esc_html__('Panel Width', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px', '%', 'vw'],
+                'range' => [
+                    'px' => [
+                        'min' => 150,
+                        'max' => 500,
+                        'step' => 1,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 250,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel' => 'min-width: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'panel_top_distance',
+            [
+                'label' => esc_html__('Distance from Button', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 50,
+                        'step' => 1,
+                    ],
+                ],
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 10,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel' => 'top: calc(100% + {{SIZE}}{{UNIT}});',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'panel_background',
+            [
+                'label' => esc_html__('Background Color', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Border::get_type(),
+            [
+                'name' => 'panel_border',
+                'label' => esc_html__('Border', 'elementor-menu-widget-v2'),
+                'selector' => '{{WRAPPER}} .action-button-panel',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'panel_border_radius',
+            [
+                'label' => esc_html__('Border Radius', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'panel_box_shadow',
+                'label' => esc_html__('Box Shadow', 'elementor-menu-widget-v2'),
+                'selector' => '{{WRAPPER}} .action-button-panel',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'panel_padding',
+            [
+                'label' => esc_html__('Padding', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', 'em', 'rem'],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'panel_items_heading',
+            [
+                'label' => esc_html__('Panel Items', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'panel_item_typography',
+                'selector' => '{{WRAPPER}} .action-button-panel-menu ul li a',
+            ]
+        );
+
+        $this->start_controls_tabs('tabs_panel_item_style');
+
+        $this->start_controls_tab(
+            'tab_panel_item_normal',
+            [
+                'label' => esc_html__('Normal', 'elementor-menu-widget-v2'),
+            ]
+        );
+
+        $this->add_control(
+            'panel_item_text_color',
+            [
+                'label' => esc_html__('Text Color', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#333333',
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul li a' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'panel_item_background',
+            [
+                'label' => esc_html__('Background Color', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul li a' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->start_controls_tab(
+            'tab_panel_item_hover',
+            [
+                'label' => esc_html__('Hover', 'elementor-menu-widget-v2'),
+            ]
+        );
+
+        $this->add_control(
+            'panel_item_text_color_hover',
+            [
+                'label' => esc_html__('Text Color', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#000000',
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul li a:hover' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'panel_item_background_hover',
+            [
+                'label' => esc_html__('Background Color', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#f5f5f5',
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul li a:hover' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->end_controls_tabs();
+
+        $this->add_responsive_control(
+            'panel_item_padding',
+            [
+                'label' => esc_html__('Item Padding', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', 'em', 'rem'],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul li a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'panel_item_spacing',
+            [
+                'label' => esc_html__('Space Between Items', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 20,
+                        'step' => 1,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .action-button-panel-menu ul li:not(:last-child)' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
         // Logo Style Section
         $this->start_controls_section(
             'logo_style_section',
