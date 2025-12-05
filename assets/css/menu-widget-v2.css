@@ -772,7 +772,7 @@ nav.vertical-menu .menu .menu-item::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: 0;
 }
 
 .menu-widget-container.layout-logo-left-nav-right-button-right .menu-logo {
