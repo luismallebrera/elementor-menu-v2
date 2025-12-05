@@ -711,10 +711,12 @@ nav.vertical-menu .menu .menu-item::after {
 
 .menu-widget-container.layout-logo-left-nav-right-button-right .horizontal-menu-nav {
     margin-left: auto;
+    margin-right: 0;
 }
 
 .menu-widget-container.layout-logo-left-nav-right-button-right .action-button-wrapper {
     flex-shrink: 0;
+    margin-left: 20px;
 }
 
 /* Action Button Wrapper */
