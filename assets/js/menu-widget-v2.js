@@ -16,6 +16,26 @@
         var mobileSubmenuIcon = $menuContainer.data('submenu-icon') || '<i class="fas fa-chevron-down"></i>';
         var horizontalSubmenuIcon = $horizontalMenu.data('submenu-icon') || '<i class="fas fa-chevron-down"></i>';
 
+        // Handle action button panel
+        var $actionButton = $scope.find('.action-button[data-behavior="panel"]');
+        var $actionPanel = $scope.find('.action-button-panel');
+        
+        if ($actionButton.length && $actionPanel.length) {
+            $actionButton.on('click', function(e) {
+                e.preventDefault();
+                $actionPanel.toggleClass('active');
+                $actionButton.toggleClass('active');
+            });
+            
+            // Close panel when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.action-button-wrapper').length) {
+                    $actionPanel.removeClass('active');
+                    $actionButton.removeClass('active');
+                }
+            });
+        }
+
         // Add submenu arrows and classes for toggle menu
         if ($menuContainer.length) {
             $menuContainer.find('.menu li').each(function() {

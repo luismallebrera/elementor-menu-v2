@@ -676,6 +676,74 @@ nav.vertical-menu .menu .menu-item::after {
     display: none;
 }
 
+/* Action Button Wrapper */
+.action-button-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.action-button-wrapper .action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.action-button-wrapper .action-button-icon-before,
+.action-button-wrapper .action-button-icon-after {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Action Button Panel */
+.action-button-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 200px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.action-button-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.action-button-panel-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+}
+
+.action-button-panel-menu ul li {
+    margin: 0;
+    padding: 0;
+}
+
+.action-button-panel-menu ul li a {
+    display: block;
+    padding: 10px 20px;
+    color: #333333;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.action-button-panel-menu ul li a:hover {
+    background: #f5f5f5;
+    color: #000000;
+}
+
 /* Layout Styles */
 /* Logo Left | Nav Center | Button Right */
 .menu-widget-container.layout-logo-left-nav-center-button-right .menu-main-container {

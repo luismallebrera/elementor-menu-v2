@@ -1897,6 +1897,70 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
+            'action_button_behavior',
+            [
+                'label' => esc_html__('Button Behavior', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    'link' => esc_html__('Direct Link', 'elementor-menu-widget-v2'),
+                    'panel' => esc_html__('Open Panel', 'elementor-menu-widget-v2'),
+                ],
+                'default' => 'link',
+                'condition' => [
+                    'enable_action_button' => 'yes',
+                ],
+            ]
+        );
+
+        $repeater = new \Elementor\Repeater();
+
+        $repeater->add_control(
+            'panel_item_text',
+            [
+                'label' => esc_html__('Text', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => esc_html__('Item', 'elementor-menu-widget-v2'),
+                'label_block' => true,
+            ]
+        );
+
+        $repeater->add_control(
+            'panel_item_link',
+            [
+                'label' => esc_html__('Link', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::URL,
+                'placeholder' => esc_html__('https://your-link.com', 'elementor-menu-widget-v2'),
+                'default' => [
+                    'url' => '#',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'action_button_panel_items',
+            [
+                'label' => esc_html__('Panel Items', 'elementor-menu-widget-v2'),
+                'type' => \Elementor\Controls_Manager::REPEATER,
+                'fields' => $repeater->get_controls(),
+                'default' => [
+                    [
+                        'panel_item_text' => esc_html__('Item 1', 'elementor-menu-widget-v2'),
+                        'panel_item_link' => ['url' => '#'],
+                    ],
+                    [
+                        'panel_item_text' => esc_html__('Item 2', 'elementor-menu-widget-v2'),
+                        'panel_item_link' => ['url' => '#'],
+                    ],
+                ],
+                'title_field' => '{{{ panel_item_text }}}',
+                'condition' => [
+                    'enable_action_button' => 'yes',
+                    'action_button_behavior' => 'panel',
+                ],
+            ]
+        );
+
+        $this->add_control(
             'action_button_icon',
             [
                 'label' => esc_html__('Icon', 'elementor-menu-widget-v2'),
@@ -4044,14 +4108,16 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                 // Render action button as separate element after toggle
                 if ($enable_action_button) :
                     $button_text = $settings['action_button_text'] ?? 'Get Started';
-                    $button_link = $settings['action_button_link']['url'] ?? '#';
+                    $button_behavior = $settings['action_button_behavior'] ?? 'link';
+                    $button_link = ($button_behavior === 'link') ? ($settings['action_button_link']['url'] ?? '#') : '#';
                     $button_target = !empty($settings['action_button_link']['is_external']) ? ' target="_blank"' : '';
                     $button_nofollow = !empty($settings['action_button_link']['nofollow']) ? ' rel="nofollow"' : '';
                     $icon_position = $settings['action_button_icon_position'] ?? 'before';
                     $has_icon = !empty($settings['action_button_icon']['value']);
+                    $data_behavior = $button_behavior === 'panel' ? ' data-behavior="panel"' : '';
                 ?>
                     <div class="action-button-wrapper">
-                        <a href="<?php echo esc_url($button_link); ?>" class="action-button"<?php echo $button_target . $button_nofollow; ?>>
+                        <a href="<?php echo esc_url($button_link); ?>" class="action-button"<?php echo $button_target . $button_nofollow . $data_behavior; ?>>
                             <?php if ($has_icon && $icon_position === 'before') : ?>
                                 <span class="action-button-icon-before">
                                     <?php \Elementor\Icons_Manager::render_icon($settings['action_button_icon'], ['aria-hidden' => 'true']); ?>
@@ -4064,6 +4130,26 @@ class Elementor_Menu_Toggle_Widget_V2 extends \Elementor\Widget_Base {
                                 </span>
                             <?php endif; ?>
                         </a>
+                        
+                        <?php if ($button_behavior === 'panel' && !empty($settings['action_button_panel_items'])) : ?>
+                            <div class="action-button-panel">
+                                <nav class="action-button-panel-menu">
+                                    <ul>
+                                        <?php foreach ($settings['action_button_panel_items'] as $item) : 
+                                            $item_link = $item['panel_item_link']['url'] ?? '#';
+                                            $item_target = !empty($item['panel_item_link']['is_external']) ? ' target="_blank"' : '';
+                                            $item_nofollow = !empty($item['panel_item_link']['nofollow']) ? ' rel="nofollow"' : '';
+                                        ?>
+                                            <li>
+                                                <a href="<?php echo esc_url($item_link); ?>"<?php echo $item_target . $item_nofollow; ?>>
+                                                    <?php echo esc_html($item['panel_item_text']); ?>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </nav>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
             <?php else : 
