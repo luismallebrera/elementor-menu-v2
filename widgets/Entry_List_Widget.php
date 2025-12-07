@@ -174,7 +174,7 @@ class Entry_List_Widget extends Widget_Base {
 			[
 				'label' => __( 'Query Parameter', 'soda-addons' ),
 				'type' => Controls_Manager::TEXT,
-				'default' => 'municipio_id',
+				'default' => '',
 				'description' => __( 'Parameter name that receives the current entry ID.', 'soda-addons' ),
 				'condition' => [
 					'link_entries' => 'yes',
@@ -642,9 +642,13 @@ class Entry_List_Widget extends Widget_Base {
 							$link_url = '';
 							if ( 'popup_query' === $link_type ) {
 								$anchor = ! empty( $popup_anchor ) ? $popup_anchor : '#popup';
-								$param = ! empty( $popup_query_param ) ? $popup_query_param : 'municipio_id';
-								$separator = strpos( $anchor, '?' ) === false ? '?' : '&';
-								$link_url = $anchor . $separator . rawurlencode( $param ) . '=' . absint( $post_id );
+								$param = sanitize_key( $popup_query_param );
+								if ( ! empty( $param ) ) {
+									$separator = strpos( $anchor, '?' ) === false ? '?' : '&';
+									$link_url = $anchor . $separator . rawurlencode( $param ) . '=' . absint( $post_id );
+								} else {
+									$link_url = $anchor;
+								}
 							} elseif ( 'popup_action' === $link_type ) {
 								$popup_id_clean = preg_replace( '/[^0-9]/', '', $popup_action_id );
 								$param_key = sanitize_key( $popup_action_param_key );
