@@ -26,9 +26,19 @@ class Entry_List_Widget extends Widget_Base {
 	private static $popup_script_enqueued = false;
 
 	/**
-	 * Store meta keys that should be exposed through the REST API per post type.
+	 * Track meta keys already registered for REST exposure per post type.
 	 */
 	private static $rest_meta_registry = [];
+
+	/**
+	 * Track whether the REST meta registry has been initialised for this request.
+	 */
+	private static $rest_meta_registry_initialized = false;
+
+	/**
+	 * Track whether the REST meta registry needs to be persisted.
+	 */
+	private static $rest_meta_registry_dirty = false;
 
 	/**
 	 * Get widget name.
@@ -1195,12 +1205,48 @@ JS;
 	}
 
 	/**
+	 * Bootstrap the REST meta registry from the persisted option.
+	 */
+	public static function bootstrap_rest_meta_registry() {
+		if ( self::$rest_meta_registry_initialized ) {
+			return;
+		}
+
+		self::$rest_meta_registry_initialized = true;
+
+		$stored_registry = get_option( 'soda_entry_list_rest_meta_registry', [] );
+		if ( is_array( $stored_registry ) ) {
+			self::$rest_meta_registry = $stored_registry;
+		}
+
+		foreach ( array_keys( self::$rest_meta_registry ) as $post_type ) {
+			add_filter( 'rest_prepare_' . $post_type, [ __CLASS__, 'inject_configured_meta' ], 10, 3 );
+		}
+
+		add_action( 'shutdown', [ __CLASS__, 'persist_rest_meta_registry' ] );
+	}
+
+	/**
+	 * Persist the REST meta registry when it has been modified.
+	 */
+	public static function persist_rest_meta_registry() {
+		if ( ! self::$rest_meta_registry_initialized || ! self::$rest_meta_registry_dirty ) {
+			return;
+		}
+
+		update_option( 'soda_entry_list_rest_meta_registry', self::$rest_meta_registry, false );
+		self::$rest_meta_registry_dirty = false;
+	}
+
+	/**
 	 * Ensure selected meta keys are exposed through the REST API for the given post type.
 	 *
 	 * @param string $post_type Post type slug.
 	 * @param array  $meta_keys Meta keys to expose.
 	 */
 	private static function ensure_rest_meta_keys( $post_type, array $meta_keys ) {
+		self::bootstrap_rest_meta_registry();
+
 		$meta_keys = array_filter( array_unique( $meta_keys ) );
 		if ( empty( $meta_keys ) ) {
 			return;
@@ -1211,7 +1257,11 @@ JS;
 			add_filter( 'rest_prepare_' . $post_type, [ __CLASS__, 'inject_configured_meta' ], 10, 3 );
 		}
 
-		self::$rest_meta_registry[ $post_type ] = array_values( array_unique( array_merge( self::$rest_meta_registry[ $post_type ], $meta_keys ) ) );
+		$combined_keys = array_values( array_unique( array_merge( self::$rest_meta_registry[ $post_type ], $meta_keys ) ) );
+		if ( $combined_keys !== self::$rest_meta_registry[ $post_type ] ) {
+			self::$rest_meta_registry[ $post_type ] = $combined_keys;
+			self::$rest_meta_registry_dirty = true;
+		}
 	}
 
 	/**
@@ -1252,3 +1302,5 @@ JS;
 		return $response;
 	}
 }
+
+	Entry_List_Widget::bootstrap_rest_meta_registry();
