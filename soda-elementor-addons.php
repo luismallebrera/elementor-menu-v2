@@ -88,7 +88,6 @@ final class Elementor_Menu_Widget_V2 {
         add_action('updated_post_meta', [$this, 'resize_noticias_featured_image_on_set'], 10, 4);
 
         $this->register_municipio_shortcodes();
-        add_action('rest_api_init', [$this, 'register_rest_routes']);
     }
 
     public function load_custom_icons() {
@@ -613,84 +612,6 @@ final class Elementor_Menu_Widget_V2 {
         add_shortcode('municipio_provincia_name', [$this, 'shortcode_municipio_provincia_name']);
     }
 
-    /**
-     * Register REST API routes required by the plugin.
-     */
-    public function register_rest_routes() {
-        register_rest_route(
-            'soda/v1',
-            '/municipios',
-            [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'rest_get_municipios_by_province'],
-                'permission_callback' => '__return_true',
-                'args' => [
-                    'province' => [
-                        'required' => true,
-                        'type' => 'integer',
-                        'description' => __('ID of the associated province.', 'soda-elementor-addons'),
-                    ],
-                    'per_page' => [
-                        'required' => false,
-                        'type' => 'integer',
-                        'default' => 100,
-                        'sanitize_callback' => 'absint',
-                    ],
-                ],
-            ]
-        );
-    }
-
-    /**
-     * Handle REST request fetching municipios linked to a province.
-     *
-     * @param \WP_REST_Request $request REST request instance.
-     * @return \WP_REST_Response
-     */
-    public function rest_get_municipios_by_province($request) {
-        $province_id = absint($request->get_param('province'));
-        if (!$province_id) {
-            return new \WP_REST_Response(['items' => []], 200);
-        }
-
-        $per_page = (int) $request->get_param('per_page');
-        if ($per_page <= 0) {
-            $per_page = 100;
-        }
-
-        $args = [
-            'post_type' => 'municipio',
-            'post_status' => 'publish',
-            'posts_per_page' => $per_page,
-            'orderby' => 'title',
-            'order' => 'ASC',
-            'no_found_rows' => true,
-            'fields' => 'ids',
-            'meta_query' => [
-                [
-                    'key' => '_municipio_provincia',
-                    'value' => $province_id,
-                    'compare' => '=',
-                ],
-            ],
-        ];
-
-        $ids = get_posts($args);
-        $items = [];
-        if (!empty($ids)) {
-            foreach ($ids as $id) {
-                $items[] = [
-                    'id' => (int) $id,
-                    'title' => get_the_title($id),
-                    'link' => get_permalink($id),
-                ];
-            }
-        }
-
-        return new \WP_REST_Response([
-            'items' => $items,
-        ], 200);
-    }
 
     /**
      * Resolve the municipio ID from shortcode attributes, query string, or current post.
