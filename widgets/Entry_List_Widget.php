@@ -807,241 +807,7 @@ class Entry_List_Widget extends Widget_Base {
 			$popup_configuration_script = 'window.SodaEntryListPopupConfig = window.SodaEntryListPopupConfig || {}; window.SodaEntryListPopupConfig["' . esc_js( $this->get_id() ) . '"] = ' . wp_json_encode( $popup_config ) . ';';
 			wp_add_inline_script( 'elementor-frontend', $popup_configuration_script, 'after' );
 
-			if ( ! self::$popup_script_enqueued ) {
-				$script = <<<'JS'
-(function(){
-	if (window.SodaEntryListPopupInit) {
-		return;
-	}
-
-	window.SodaEntryListPopupInit = true;
-	window.SodaEntryListPopupConfig = window.SodaEntryListPopupConfig || {};
-	window.SodaEntryListPopupCache = window.SodaEntryListPopupCache || {};
-
-	function decodeEntities(str) {
-		var textarea = document.createElement('textarea');
-		textarea.innerHTML = str;
-		return textarea.value;
-	}
-
-	function applyData(config, data) {
-		if (!data) {
-			return;
-		}
-
-		var selectors = config.selectors || {};
-
-		if (selectors.title) {
-			document.querySelectorAll(selectors.title).forEach(function(element){
-				element.textContent = data.title && data.title.rendered ? decodeEntities(data.title.rendered) : '';
-			});
-		}
-
-		if (selectors.excerpt) {
-			document.querySelectorAll(selectors.excerpt).forEach(function(element){
-				element.innerHTML = data.excerpt && data.excerpt.rendered ? data.excerpt.rendered : '';
-			});
-		}
-
-		if (selectors.content) {
-			document.querySelectorAll(selectors.content).forEach(function(element){
-				element.innerHTML = data.content && data.content.rendered ? data.content.rendered : '';
-			});
-		}
-
-		if (selectors.featured_image) {
-			var imageUrl = '';
-			if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0] && data._embedded['wp:featuredmedia'][0].source_url) {
-				imageUrl = data._embedded['wp:featuredmedia'][0].source_url;
-			}
-
-			if (imageUrl) {
-				document.querySelectorAll(selectors.featured_image).forEach(function(element){
-					if (element.tagName === 'IMG') {
-						element.src = imageUrl;
-					} else {
-						element.style.backgroundImage = 'url(' + imageUrl + ')';
-					}
-				});
-			}
-		}
-
-		var metaSelectors = config.meta || {};
-		Object.keys(metaSelectors).forEach(function(metaKey){
-			var selector = metaSelectors[metaKey];
-			if (!selector) {
-				return;
-			}
-
-			var value = '';
-			if (data.meta && typeof data.meta === 'object' && data.meta.hasOwnProperty(metaKey)) {
-				value = data.meta[metaKey];
-			} else if (data.hasOwnProperty(metaKey)) {
-				value = data[metaKey];
-			} else if (data.acf && typeof data.acf === 'object' && data.acf.hasOwnProperty(metaKey)) {
-				value = data.acf[metaKey];
-			}
-
-			if (Array.isArray(value)) {
-				value = value.join(', ');
-			} else if (value && typeof value === 'object') {
-				if (Object.prototype.hasOwnProperty.call(value, 'rendered')) {
-					value = value.rendered;
-				} else {
-					value = '';
-				}
-			}
-
-			if (value === null || typeof value === 'undefined') {
-				value = '';
-			}
-
-			document.querySelectorAll(selector).forEach(function(element){
-				if ('value' in element) {
-					element.value = value;
-				} else {
-					element.textContent = value;
-				}
-			});
-		});
-	}
-
-	function updatePopupContent(config, postId) {
-		if (!config || !config.restUrl) {
-			return;
-		}
-
-		var cacheKey = config.postType + ':' + postId;
-		if (window.SodaEntryListPopupCache[cacheKey]) {
-			applyData(config, window.SodaEntryListPopupCache[cacheKey]);
-			return;
-		}
-
-		var url = config.restUrl + postId + '?_embed=1';
-		fetch(url, { credentials: 'same-origin' })
-			.then(function(response){
-				if (!response.ok) {
-					throw new Error('Request failed');
-				}
-				return response.json();
-			})
-			.then(function(data){
-				window.SodaEntryListPopupCache[cacheKey] = data;
-				applyData(config, data);
-			})
-			.catch(function(){
-				// Silent failure.
-			});
-	}
-
-	document.addEventListener('click', function(event){
-		var trigger = event.target.closest('[data-soda-entry-link]');
-		if (!trigger) {
-			return;
-		}
-
-		var widgetId = trigger.getAttribute('data-soda-entry-widget') || '';
-		var postId = parseInt(trigger.getAttribute('data-soda-post-id'), 10);
-
-		if (!widgetId || !postId) {
-			return;
-		}
-
-		var config = window.SodaEntryListPopupConfig[widgetId] || {};
-		var deliveryMode = config.delivery || trigger.getAttribute('data-soda-entry-delivery') || 'query';
-		var paramKey = config.paramKey || trigger.getAttribute('data-soda-param-key') || 'post';
-
-		if (deliveryMode === 'data_attribute' && paramKey) {
-			var attrName = 'data-' + paramKey.replace(/_/g, '-');
-			trigger.setAttribute(attrName, postId);
-		} else if (deliveryMode === 'query' && paramKey) {
-			try {
-				var urlObject = new URL(window.location.href);
-				urlObject.searchParams.set(paramKey, postId);
-				window.history.replaceState({}, '', urlObject.href);
-			} catch (error) {
-				var parts = window.location.href.split('#');
-				var base = parts[0];
-				var hash = parts.length > 1 ? '#' + parts.slice(1).join('#') : '';
-				var pattern = new RegExp('([?&])' + paramKey + '=([^&#]*)');
-				if (pattern.test(base)) {
-					base = base.replace(pattern, '$1' + paramKey + '=' + postId);
-				} else if (base.indexOf('?') !== -1) {
-					base = base + '&' + paramKey + '=' + postId;
-				} else {
-					base = base + '?' + paramKey + '=' + postId;
-				}
-				window.history.replaceState({}, '', base + hash);
-			}
-		}
-
-		var popupSettings = {};
-		var settingsAttr = trigger.getAttribute('data-elementor-popup-settings');
-
-		if (settingsAttr) {
-			try {
-				popupSettings = JSON.parse(settingsAttr);
-			} catch (error) {
-				popupSettings = {};
-			}
-		}
-
-		var popupId = popupSettings.id || config.popupId;
-
-		if (!popupId) {
-			var popupIdAttr = trigger.getAttribute('data-elementor-popup-id');
-			if (popupIdAttr) {
-				popupId = parseInt(popupIdAttr, 10);
-			} else {
-				var href = trigger.getAttribute('href') || '';
-				var match = href.match(/popup=([0-9]+)/);
-				if (match) {
-					popupId = parseInt(match[1], 10);
-				}
-			}
-		}
-
-		if (popupId) {
-			popupSettings.id = popupId;
-		}
-
-		if (!paramKey) {
-			paramKey = 'post';
-		}
-
-		popupSettings[paramKey] = postId;
-		popupSettings.post = postId;
-		popupSettings.postId = postId;
-		popupSettings.post_id = postId;
-
-		if (!popupSettings.dynamic || typeof popupSettings.dynamic !== 'object') {
-			popupSettings.dynamic = {};
-		}
-
-		popupSettings.dynamic[paramKey] = postId;
-		popupSettings.dynamic.post = postId;
-		popupSettings.dynamic.postId = postId;
-		popupSettings.dynamic.post_id = postId;
-
-		if (!popupSettings.id) {
-			return;
-		}
-
-		event.preventDefault();
-
-		if (typeof elementorProFrontend !== 'undefined' && elementorProFrontend.modules && elementorProFrontend.modules.popup) {
-			elementorProFrontend.modules.popup.showPopup({ id: popupSettings.id, settings: popupSettings });
-		}
-
-		if (config.dynamic) {
-			updatePopupContent(config, postId);
-		}
-	});
-})();
-JS;
-					wp_add_inline_script( 'elementor-frontend', $script, 'after' );
-					self::$popup_script_enqueued = true;
-				}
+			self::enqueue_popup_script();
 		}
 
 		$args = [
@@ -1164,11 +930,7 @@ JS;
 									$link_extra_attributes['data-soda-post-id'] = absint( $post_id );
 									$link_extra_attributes['data-soda-entry-delivery'] = 'action';
 									$link_extra_attributes['data-soda-param-key'] = $param_key;
-									if ( ! self::$popup_script_enqueued ) {
-										$script = "(function(){document.addEventListener('click',function(event){var trigger=event.target.closest('[data-elementor-open-popup][data-elementor-popup-id]');if(!trigger){return;}event.preventDefault();if(window.elementorProFrontend&&elementorProFrontend.modules&&elementorProFrontend.modules.popup){var settingsAttr=trigger.getAttribute('data-elementor-popup-settings');var settings={};if(settingsAttr){try{settings=JSON.parse(settingsAttr);}catch(e){settings={};}}if(!settings.id){var idAttr=trigger.getAttribute('data-elementor-popup-id');if(idAttr){settings.id=parseInt(idAttr,10)||idAttr;}}if(settings.id){elementorProFrontend.modules.popup.showPopup({id:settings.id,settings:settings});}}});})();";
-										wp_add_inline_script( 'elementor-frontend', $script, 'after' );
-										self::$popup_script_enqueued = true;
-									}
+									self::enqueue_popup_script();
 								}
 							}
 
@@ -1236,6 +998,321 @@ JS;
 
 		update_option( 'soda_entry_list_rest_meta_registry', self::$rest_meta_registry, false );
 		self::$rest_meta_registry_dirty = false;
+	}
+
+	/**
+	 * Ensure selected meta keys are exposed through the REST API for the given post type.
+	 *
+	 * @param string $post_type Post type slug.
+	 * @param array  $meta_keys Meta keys to expose.
+	 */
+	public static function register_popup_meta_keys( $post_type, array $meta_keys ) {
+		self::ensure_rest_meta_keys( $post_type, $meta_keys );
+	}
+
+	/**
+	 * Ensure the popup helper script is enqueued only once per request.
+	 */
+	public static function enqueue_popup_script() {
+		if ( self::$popup_script_enqueued ) {
+			return;
+		}
+
+		$script = <<<'JS'
+(function(){
+	if (window.SodaEntryListPopupInit) {
+		return;
+	}
+
+	window.SodaEntryListPopupInit = true;
+	window.SodaEntryListPopupConfig = window.SodaEntryListPopupConfig || {};
+	window.SodaEntryListPopupCache = window.SodaEntryListPopupCache || {};
+
+	function decodeEntities(str) {
+		var textarea = document.createElement('textarea');
+		textarea.innerHTML = str;
+		return textarea.value;
+	}
+
+	function applyData(config, data) {
+		if (!data) {
+			return;
+		}
+
+		var selectors = config.selectors || {};
+
+		if (selectors.title) {
+			document.querySelectorAll(selectors.title).forEach(function(element){
+				element.textContent = data.title && data.title.rendered ? decodeEntities(data.title.rendered) : '';
+			});
+		}
+
+		if (selectors.excerpt) {
+			document.querySelectorAll(selectors.excerpt).forEach(function(element){
+				element.innerHTML = data.excerpt && data.excerpt.rendered ? data.excerpt.rendered : '';
+			});
+		}
+
+		if (selectors.content) {
+			document.querySelectorAll(selectors.content).forEach(function(element){
+				element.innerHTML = data.content && data.content.rendered ? data.content.rendered : '';
+			});
+		}
+
+		if (selectors.featured_image) {
+			var imageUrl = '';
+			if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0] && data._embedded['wp:featuredmedia'][0].source_url) {
+				imageUrl = data._embedded['wp:featuredmedia'][0].source_url;
+			}
+
+			if (imageUrl) {
+				document.querySelectorAll(selectors.featured_image).forEach(function(element){
+					if (element.tagName === 'IMG') {
+						element.src = imageUrl;
+					} else {
+						element.style.backgroundImage = 'url(' + imageUrl + ')';
+					}
+				});
+			}
+		}
+
+		var metaSelectors = config.meta || {};
+		Object.keys(metaSelectors).forEach(function(metaKey){
+			var selector = metaSelectors[metaKey];
+			if (!selector) {
+				return;
+			}
+
+			var value = '';
+			if (data.meta && typeof data.meta === 'object' && data.meta.hasOwnProperty(metaKey)) {
+				value = data.meta[metaKey];
+			} else if (data.hasOwnProperty(metaKey)) {
+				value = data[metaKey];
+			} else if (data.acf && typeof data.acf === 'object' && data.acf.hasOwnProperty(metaKey)) {
+				value = data.acf[metaKey];
+			}
+
+			if (Array.isArray(value)) {
+				value = value.join(', ');
+			} else if (value && typeof value === 'object') {
+				if (Object.prototype.hasOwnProperty.call(value, 'rendered')) {
+					value = value.rendered;
+				} else {
+					value = '';
+				}
+			}
+
+			if (value === null || typeof value === 'undefined') {
+				value = '';
+			}
+
+			document.querySelectorAll(selector).forEach(function(element){
+				if ('value' in element) {
+					element.value = value;
+				} else {
+					element.textContent = value;
+				}
+			});
+		});
+	}
+
+	window.SodaEntryListPopupApplyData = applyData;
+	window.SodaEntryListPopupUpdateContent = updatePopupContent;
+
+	function showPopupWithConfig(config, postId, baseSettings) {
+		if (!config || !postId) {
+			return null;
+		}
+
+		var popupSettings = {};
+		if (baseSettings && typeof baseSettings === 'object') {
+			try {
+				popupSettings = JSON.parse(JSON.stringify(baseSettings));
+			} catch (error) {
+				popupSettings = Object.assign({}, baseSettings);
+			}
+		}
+
+		var paramKey = config.paramKey || 'post';
+		if (!popupSettings.id && config.popupId) {
+			popupSettings.id = config.popupId;
+		}
+
+		if (!popupSettings.id) {
+			return null;
+		}
+
+		if (config.delivery === 'query' && paramKey) {
+			try {
+				var urlObject = new URL(window.location.href);
+				urlObject.searchParams.set(paramKey, postId);
+				window.history.replaceState({}, '', urlObject.href);
+			} catch (error) {
+				var parts = window.location.href.split('#');
+				var base = parts[0];
+				var hash = parts.length > 1 ? '#' + parts.slice(1).join('#') : '';
+				var pattern = new RegExp('([?&])' + paramKey + '=([^&#]*)');
+				if (pattern.test(base)) {
+					base = base.replace(pattern, '$1' + paramKey + '=' + postId);
+				} else if (base.indexOf('?') !== -1) {
+					base = base + '&' + paramKey + '=' + postId;
+				} else {
+					base = base + '?' + paramKey + '=' + postId;
+				}
+
+				window.history.replaceState({}, '', base + hash);
+			}
+		}
+
+		popupSettings[paramKey] = postId;
+		popupSettings.post = postId;
+		popupSettings.postId = postId;
+		popupSettings.post_id = postId;
+
+		if (!popupSettings.dynamic || typeof popupSettings.dynamic !== 'object') {
+			popupSettings.dynamic = {};
+		}
+
+		popupSettings.dynamic[paramKey] = postId;
+		popupSettings.dynamic.post = postId;
+		popupSettings.dynamic.postId = postId;
+		popupSettings.dynamic.post_id = postId;
+
+		if (typeof elementorProFrontend !== 'undefined' && elementorProFrontend.modules && elementorProFrontend.modules.popup) {
+			elementorProFrontend.modules.popup.showPopup({ id: popupSettings.id, settings: popupSettings });
+		}
+
+		if (config.dynamic) {
+			updatePopupContent(config, postId);
+		}
+
+		return popupSettings;
+	}
+
+	window.SodaEntryListPopupShowConfig = showPopupWithConfig;
+	window.SodaEntryListPopupOpen = function(widgetId, postId, baseSettings){
+		if (!widgetId) {
+			return null;
+		}
+		var config = window.SodaEntryListPopupConfig[widgetId] || null;
+		if (!config) {
+			return null;
+		}
+		return showPopupWithConfig(config, postId, baseSettings || {});
+	};
+
+	function updatePopupContent(config, postId) {
+		if (!config || !config.restUrl) {
+			return;
+		}
+
+		var cacheKey = config.postType + ':' + postId;
+		if (window.SodaEntryListPopupCache[cacheKey]) {
+			applyData(config, window.SodaEntryListPopupCache[cacheKey]);
+			return;
+		}
+
+		var url = config.restUrl + postId + '?_embed=1';
+		fetch(url, { credentials: 'same-origin' })
+			.then(function(response){
+				if (!response.ok) {
+					throw new Error('Request failed');
+				}
+				return response.json();
+			})
+			.then(function(data){
+				window.SodaEntryListPopupCache[cacheKey] = data;
+				applyData(config, data);
+			})
+			.catch(function(){
+				// Silent failure.
+			});
+	}
+
+	document.addEventListener('click', function(event){
+		var trigger = event.target.closest('[data-soda-entry-link]');
+		if (!trigger) {
+			return;
+		}
+
+		var widgetId = trigger.getAttribute('data-soda-entry-widget') || '';
+		var postId = parseInt(trigger.getAttribute('data-soda-post-id'), 10);
+
+		if (!widgetId || !postId) {
+			return;
+		}
+
+		var config = window.SodaEntryListPopupConfig[widgetId] || {};
+		var deliveryMode = config.delivery || trigger.getAttribute('data-soda-entry-delivery') || 'query';
+		var paramKey = config.paramKey || trigger.getAttribute('data-soda-param-key') || 'post';
+
+		if (deliveryMode === 'data_attribute' && paramKey) {
+			var attrName = 'data-' + paramKey.replace(/_/g, '-');
+			trigger.setAttribute(attrName, postId);
+		} else if (deliveryMode === 'query' && paramKey) {
+			try {
+				var urlObject = new URL(window.location.href);
+				urlObject.searchParams.set(paramKey, postId);
+				window.history.replaceState({}, '', urlObject.href);
+			} catch (error) {
+				var parts = window.location.href.split('#');
+				var base = parts[0];
+				var hash = parts.length > 1 ? '#' + parts.slice(1).join('#') : '';
+				var pattern = new RegExp('([?&])' + paramKey + '=([^&#]*)');
+				if (pattern.test(base)) {
+					base = base.replace(pattern, '$1' + paramKey + '=' + postId);
+				} else if (base.indexOf('?') !== -1) {
+					base = base + '&' + paramKey + '=' + postId;
+				} else {
+					base = base + '?' + paramKey + '=' + postId;
+				}
+				window.history.replaceState({}, '', base + hash);
+			}
+		}
+
+		var popupSettings = {};
+		var settingsAttr = trigger.getAttribute('data-elementor-popup-settings');
+
+		if (settingsAttr) {
+			try {
+				popupSettings = JSON.parse(settingsAttr);
+			} catch (error) {
+				popupSettings = {};
+			}
+		}
+
+		var popupId = popupSettings.id || config.popupId;
+
+		if (!popupId) {
+			var popupIdAttr = trigger.getAttribute('data-elementor-popup-id');
+			if (popupIdAttr) {
+				popupId = parseInt(popupIdAttr, 10);
+			} else {
+				var href = trigger.getAttribute('href') || '';
+				var match = href.match(/popup=([0-9]+)/);
+				if (match) {
+					popupId = parseInt(match[1], 10);
+				}
+			}
+		}
+
+		if (popupId) {
+			popupSettings.id = popupId;
+		}
+
+		if (!paramKey) {
+			paramKey = 'post';
+		}
+
+		event.preventDefault();
+
+		showPopupWithConfig(config, postId, popupSettings);
+	});
+})();
+JS;
+
+		wp_add_inline_script( 'elementor-frontend', $script, 'after' );
+		self::$popup_script_enqueued = true;
 	}
 
 	/**
