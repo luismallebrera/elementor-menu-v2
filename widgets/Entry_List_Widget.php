@@ -671,7 +671,8 @@ class Entry_List_Widget extends Widget_Base {
 
 								if ( 'data_attribute' === $delivery_mode ) {
 									$link_url = $anchor;
-									$link_extra_attributes[ 'data-' . $param ] = absint( $post_id );
+									$data_attr_name = 'data-' . str_replace( '_', '-', $param );
+									$link_extra_attributes[ $data_attr_name ] = absint( $post_id );
 								} else {
 									$separator = strpos( $anchor, '?' ) === false ? '?' : '&';
 									$link_url = $anchor . $separator . rawurlencode( $param ) . '=' . absint( $post_id );
@@ -697,13 +698,13 @@ class Entry_List_Widget extends Widget_Base {
 							}
 							?>
 							<?php
-							$link_attributes = [ 'href' => esc_url( $link_url ) ];
+							$link_attributes = [ 'href' => $link_url ];
 							foreach ( $link_extra_attributes as $attr_key => $attr_value ) {
-								$link_attributes[ $attr_key ] = esc_attr( $attr_value );
+								$link_attributes[ $attr_key ] = $attr_value;
 							}
 							$attributes_output = [];
 							foreach ( $link_attributes as $attr_key => $attr_value ) {
-								$attributes_output[] = sprintf( '%s="%s"', esc_attr( $attr_key ), $attr_value );
+								$attributes_output[] = sprintf( '%s="%s"', esc_attr( $attr_key ), esc_attr( $attr_value ) );
 							}
 							?>
 							<a <?php echo implode( ' ', $attributes_output ); ?>>
