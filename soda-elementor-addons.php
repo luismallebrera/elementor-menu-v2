@@ -86,6 +86,8 @@ final class Elementor_Menu_Widget_V2 {
         // Auto-resize featured images for noticias CPT
         add_action('added_post_meta', [$this, 'resize_noticias_featured_image_on_set'], 10, 4);
         add_action('updated_post_meta', [$this, 'resize_noticias_featured_image_on_set'], 10, 4);
+
+        $this->register_municipio_shortcodes();
     }
 
     public function load_custom_icons() {
@@ -600,6 +602,132 @@ final class Elementor_Menu_Widget_V2 {
         }
         
         return false;
+    }
+
+    /**
+     * Register shortcodes to expose municipio related data inside popups.
+     */
+    private function register_municipio_shortcodes() {
+        add_shortcode('municipio_galgdr_name', [$this, 'shortcode_municipio_galgdr_name']);
+        add_shortcode('municipio_provincia_name', [$this, 'shortcode_municipio_provincia_name']);
+    }
+
+    /**
+     * Resolve the municipio ID from shortcode attributes, query string, or current post.
+     *
+     * @param array $atts Shortcode attributes.
+     * @return int
+     */
+    private function resolve_municipio_context_id($atts) {
+        if (isset($atts['id'])) {
+            return absint($atts['id']);
+        }
+
+        if (isset($_GET['municipio_id'])) {
+            return absint(wp_unslash($_GET['municipio_id']));
+        }
+
+        $queried = get_queried_object();
+        if ($queried instanceof \WP_Post && $queried->post_type === 'municipio') {
+            return (int) $queried->ID;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Attempt to resolve a taxonomy term name using its ID.
+     *
+     * @param int $term_id Term identifier.
+     * @return string
+     */
+    private function resolve_term_name($term_id) {
+        $term_id = absint($term_id);
+        if (!$term_id) {
+            return '';
+        }
+
+        $taxonomies = get_taxonomies([], 'names');
+        foreach ($taxonomies as $taxonomy) {
+            $term = get_term_by('id', $term_id, $taxonomy);
+            if ($term && ! is_wp_error($term)) {
+                return $term->name;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Shortcode callback that renders the GAL/GDR name linked to a municipio.
+     *
+     * @param array $atts Shortcode attributes.
+     * @return string
+     */
+    public function shortcode_municipio_galgdr_name($atts = []) {
+        $municipio_id = $this->resolve_municipio_context_id($atts);
+        if (!$municipio_id) {
+            return '';
+        }
+
+        $gal_id = get_post_meta($municipio_id, '_municipio_galgdr_asociado', true);
+        if (empty($gal_id)) {
+            return '';
+        }
+
+        $name = '';
+
+        if (is_numeric($gal_id)) {
+            $related_post = get_post((int) $gal_id);
+            if ($related_post instanceof \WP_Post) {
+                $name = $related_post->post_title;
+            }
+            if ($name === '') {
+                $name = $this->resolve_term_name((int) $gal_id);
+            }
+        }
+
+        if ($name === '' && is_string($gal_id)) {
+            $name = $gal_id;
+        }
+
+        return $name !== '' ? esc_html($name) : '';
+    }
+
+    /**
+     * Shortcode callback that renders the provincia name linked to a municipio.
+     *
+     * @param array $atts Shortcode attributes.
+     * @return string
+     */
+    public function shortcode_municipio_provincia_name($atts = []) {
+        $municipio_id = $this->resolve_municipio_context_id($atts);
+        if (!$municipio_id) {
+            return '';
+        }
+
+        $province_id = get_post_meta($municipio_id, '_municipio_provincia', true);
+        if (empty($province_id)) {
+            return '';
+        }
+
+        $name = '';
+
+        if (is_numeric($province_id)) {
+            $related_post = get_post((int) $province_id);
+            if ($related_post instanceof \WP_Post) {
+                $name = $related_post->post_title;
+            }
+            if ($name === '') {
+                $name = $this->resolve_term_name((int) $province_id);
+            }
+        }
+
+        if ($name === '' && is_string($province_id)) {
+            $name = $province_id;
+        }
+
+        return $name !== '' ? esc_html($name) : '';
     }
 }
 
