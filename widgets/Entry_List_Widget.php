@@ -20,6 +20,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Entry_List_Widget extends Widget_Base {
 
 	/**
+	 * Track whether popup helper script was enqueued.
+	 */
+	private static $popup_script_enqueued = false;
+
+	/**
 	 * Get widget name.
 	 */
 	public function get_name() {
@@ -692,6 +697,11 @@ class Entry_List_Widget extends Widget_Base {
 										$param_key => absint( $post_id ),
 									];
 									$link_extra_attributes['data-elementor-popup-settings'] = wp_json_encode( $popup_settings );
+									if ( ! self::$popup_script_enqueued ) {
+										$script = "(function(){document.addEventListener('click',function(event){var trigger=event.target.closest('[data-elementor-open-popup][data-elementor-popup-id]');if(!trigger){return;}event.preventDefault();if(window.elementorProFrontend&&elementorProFrontend.modules&&elementorProFrontend.modules.popup){var settingsAttr=trigger.getAttribute('data-elementor-popup-settings');var settings={};if(settingsAttr){try{settings=JSON.parse(settingsAttr);}catch(e){settings={};}}if(!settings.id){var idAttr=trigger.getAttribute('data-elementor-popup-id');if(idAttr){settings.id=parseInt(idAttr,10)||idAttr;}}if(settings.id){elementorProFrontend.modules.popup.showPopup({id:settings.id,settings:settings});}}});})();";
+										wp_add_inline_script( 'elementor-frontend', $script, 'after' );
+										self::$popup_script_enqueued = true;
+									}
 								}
 							}
 
