@@ -108,6 +108,20 @@ class Taxonomy_List_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'display_mode',
+			[
+				'label' => __( 'Display Mode', 'soda-addons' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'current_post' => __( 'Related to Current Post', 'soda-addons' ),
+					'all_terms' => __( 'All Terms', 'soda-addons' ),
+				],
+				'default' => 'current_post',
+				'description' => __( 'Choose whether to display terms from the current post or all available terms in the taxonomy.', 'soda-addons' ),
+			]
+		);
+
+		$this->add_control(
 			'show_label',
 			[
 				'label' => __( 'Show Label', 'soda-addons' ),
@@ -540,30 +554,49 @@ class Taxonomy_List_Widget extends Widget_Base {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 
-		// Get current post
-		$post_id = get_the_ID();
-		if ( ! $post_id ) {
-			if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
-				echo '<div class="soda-taxonomy-list__message">' . __( 'This widget displays taxonomies from the current post. Please view it on a single post page.', 'soda-addons' ) . '</div>';
-			}
-			return;
-		}
-
 		$taxonomy = $settings['taxonomy'];
+		$display_mode = isset( $settings['display_mode'] ) ? $settings['display_mode'] : 'current_post';
 		$show_label = $settings['show_label'] === 'yes';
 		$label_text = ! empty( $settings['label_text'] ) ? $settings['label_text'] : '';
 		$separator = $settings['separator'];
 		$link_terms = $settings['link_terms'] === 'yes';
 		$html_tag = $settings['html_tag'];
 
-		// Get terms for the current post
-		$terms = get_the_terms( $post_id, $taxonomy );
+		if ( ! in_array( $display_mode, [ 'current_post', 'all_terms' ], true ) ) {
+			$display_mode = 'current_post';
+		}
 
-		if ( is_wp_error( $terms ) || empty( $terms ) ) {
-			if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
-				echo '<div class="soda-taxonomy-list__message">' . __( 'No terms found for this taxonomy on the current post.', 'soda-addons' ) . '</div>';
+		$terms = [];
+
+		if ( 'all_terms' === $display_mode ) {
+			$terms = get_terms( [
+				'taxonomy' => $taxonomy,
+				'hide_empty' => false,
+			] );
+
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
+					echo '<div class="soda-taxonomy-list__message">' . __( 'No terms found for this taxonomy.', 'soda-addons' ) . '</div>';
+				}
+				return;
 			}
-			return;
+		} else {
+			$post_id = get_the_ID();
+			if ( ! $post_id ) {
+				if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
+					echo '<div class="soda-taxonomy-list__message">' . __( 'This widget displays taxonomies from the current post. Please view it on a single post page.', 'soda-addons' ) . '</div>';
+				}
+				return;
+			}
+
+			$terms = get_the_terms( $post_id, $taxonomy );
+
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
+					echo '<div class="soda-taxonomy-list__message">' . __( 'No terms found for this taxonomy on the current post.', 'soda-addons' ) . '</div>';
+				}
+				return;
+			}
 		}
 
 		// Get taxonomy object for label
