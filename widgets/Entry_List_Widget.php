@@ -139,6 +139,79 @@ class Entry_List_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'link_type',
+			[
+				'label' => __( 'Link Type', 'soda-addons' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'permalink' => __( 'Post Permalink', 'soda-addons' ),
+					'popup_query' => __( 'Popup Anchor (Query String)', 'soda-addons' ),
+					'popup_action' => __( 'Elementor Popup Action', 'soda-addons' ),
+				],
+				'default' => 'permalink',
+				'condition' => [
+					'link_entries' => 'yes',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_anchor',
+			[
+				'label' => __( 'Popup Anchor', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => '#popup-7468',
+				'description' => __( 'Anchor that triggers the popup (example: #popup-7468).', 'soda-addons' ),
+				'condition' => [
+					'link_entries' => 'yes',
+					'link_type' => 'popup_query',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_query_param',
+			[
+				'label' => __( 'Query Parameter', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => 'municipio_id',
+				'description' => __( 'Parameter name that receives the current entry ID.', 'soda-addons' ),
+				'condition' => [
+					'link_entries' => 'yes',
+					'link_type' => 'popup_query',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_action_id',
+			[
+				'label' => __( 'Popup ID', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => '7468',
+				'description' => __( 'Template ID of the Elementor popup to open.', 'soda-addons' ),
+				'condition' => [
+					'link_entries' => 'yes',
+					'link_type' => 'popup_action',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_action_param_key',
+			[
+				'label' => __( 'Action Parameter Key', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => 'post',
+				'description' => __( 'Key that receives the current entry ID in the action URL.', 'soda-addons' ),
+				'condition' => [
+					'link_entries' => 'yes',
+					'link_type' => 'popup_action',
+				],
+			]
+		);
+
+		$this->add_control(
 			'html_tag',
 			[
 				'label' => __( 'Label HTML Tag', 'soda-addons' ),
@@ -501,6 +574,11 @@ class Entry_List_Widget extends Widget_Base {
 		$separator = $settings['separator'];
 		$link_entries = $settings['link_entries'] === 'yes';
 		$html_tag = $settings['html_tag'];
+		$link_type = isset( $settings['link_type'] ) ? $settings['link_type'] : 'permalink';
+		$popup_anchor = isset( $settings['popup_anchor'] ) ? $settings['popup_anchor'] : '';
+		$popup_query_param = isset( $settings['popup_query_param'] ) ? $settings['popup_query_param'] : '';
+		$popup_action_id = isset( $settings['popup_action_id'] ) ? $settings['popup_action_id'] : '';
+		$popup_action_param_key = isset( $settings['popup_action_param_key'] ) ? $settings['popup_action_param_key'] : 'post';
 
 		$args = [
 			'post_type' => $post_type,
@@ -559,7 +637,35 @@ class Entry_List_Widget extends Widget_Base {
 					?>
 					<span class="soda-entry-list__item">
 						<?php if ( $link_entries ) : ?>
-							<a href="<?php echo esc_url( get_permalink() ); ?>">
+							<?php
+							$post_id = get_the_ID();
+							$link_url = '';
+							if ( 'popup_query' === $link_type ) {
+								$anchor = ! empty( $popup_anchor ) ? $popup_anchor : '#popup';
+								$param = ! empty( $popup_query_param ) ? $popup_query_param : 'municipio_id';
+								$separator = strpos( $anchor, '?' ) === false ? '?' : '&';
+								$link_url = $anchor . $separator . rawurlencode( $param ) . '=' . absint( $post_id );
+							} elseif ( 'popup_action' === $link_type ) {
+								$popup_id_clean = preg_replace( '/[^0-9]/', '', $popup_action_id );
+								$param_key = sanitize_key( $popup_action_param_key );
+								if ( empty( $param_key ) ) {
+									$param_key = 'post';
+								}
+								if ( ! empty( $popup_id_clean ) ) {
+									$link_url = sprintf(
+										'#elementor-action:popup=%s&%s=%d',
+										rawurlencode( $popup_id_clean ),
+										rawurlencode( $param_key ),
+										absint( $post_id )
+									);
+								}
+							}
+
+							if ( empty( $link_url ) ) {
+								$link_url = get_permalink( $post_id );
+							}
+							?>
+							<a href="<?php echo esc_attr( $link_url ); ?>">
 								<?php echo esc_html( get_the_title() ); ?>
 							</a>
 						<?php else : ?>
