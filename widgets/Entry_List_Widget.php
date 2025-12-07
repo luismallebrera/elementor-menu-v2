@@ -184,6 +184,23 @@ class Entry_List_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'popup_param_delivery',
+			[
+				'label' => __( 'Parameter Delivery', 'soda-addons' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'query' => __( 'Query String', 'soda-addons' ),
+					'data_attribute' => __( 'Data Attribute', 'soda-addons' ),
+				],
+				'default' => 'query',
+				'condition' => [
+					'link_entries' => 'yes',
+					'link_type' => 'popup_query',
+				],
+			]
+		);
+
+		$this->add_control(
 			'popup_action_id',
 			[
 				'label' => __( 'Popup ID', 'soda-addons' ),
@@ -577,6 +594,7 @@ class Entry_List_Widget extends Widget_Base {
 		$link_type = isset( $settings['link_type'] ) ? $settings['link_type'] : 'permalink';
 		$popup_anchor = isset( $settings['popup_anchor'] ) ? $settings['popup_anchor'] : '';
 		$popup_query_param = isset( $settings['popup_query_param'] ) ? $settings['popup_query_param'] : '';
+		$popup_param_delivery = isset( $settings['popup_param_delivery'] ) ? $settings['popup_param_delivery'] : 'query';
 		$popup_action_id = isset( $settings['popup_action_id'] ) ? $settings['popup_action_id'] : '';
 		$popup_action_param_key = isset( $settings['popup_action_param_key'] ) ? $settings['popup_action_param_key'] : 'post';
 
@@ -640,14 +658,24 @@ class Entry_List_Widget extends Widget_Base {
 							<?php
 							$post_id = get_the_ID();
 							$link_url = '';
+							$link_extra_attributes = [];
+
 							if ( 'popup_query' === $link_type ) {
 								$anchor = ! empty( $popup_anchor ) ? $popup_anchor : '#popup';
 								$param = sanitize_key( $popup_query_param );
 								if ( empty( $param ) ) {
 									$param = 'municipio_id';
 								}
-								$separator = strpos( $anchor, '?' ) === false ? '?' : '&';
-								$link_url = $anchor . $separator . rawurlencode( $param ) . '=' . absint( $post_id );
+
+								$delivery_mode = in_array( $popup_param_delivery, [ 'query', 'data_attribute' ], true ) ? $popup_param_delivery : 'query';
+
+								if ( 'data_attribute' === $delivery_mode ) {
+									$link_url = $anchor;
+									$link_extra_attributes[ 'data-' . $param ] = absint( $post_id );
+								} else {
+									$separator = strpos( $anchor, '?' ) === false ? '?' : '&';
+									$link_url = $anchor . $separator . rawurlencode( $param ) . '=' . absint( $post_id );
+								}
 							} elseif ( 'popup_action' === $link_type ) {
 								$popup_id_clean = preg_replace( '/[^0-9]/', '', $popup_action_id );
 								$param_key = sanitize_key( $popup_action_param_key );
@@ -668,7 +696,17 @@ class Entry_List_Widget extends Widget_Base {
 								$link_url = get_permalink( $post_id );
 							}
 							?>
-							<a href="<?php echo esc_attr( $link_url ); ?>">
+							<?php
+							$link_attributes = [ 'href' => esc_url( $link_url ) ];
+							foreach ( $link_extra_attributes as $attr_key => $attr_value ) {
+								$link_attributes[ $attr_key ] = esc_attr( $attr_value );
+							}
+							$attributes_output = [];
+							foreach ( $link_attributes as $attr_key => $attr_value ) {
+								$attributes_output[] = sprintf( '%s="%s"', esc_attr( $attr_key ), $attr_value );
+							}
+							?>
+							<a <?php echo implode( ' ', $attributes_output ); ?>>
 								<?php echo esc_html( get_the_title() ); ?>
 							</a>
 						<?php else : ?>
