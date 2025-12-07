@@ -255,6 +255,77 @@ class Entry_List_Widget extends Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->start_controls_section(
+			'popup_content_section',
+			[
+				'label' => __( 'Popup Content', 'soda-addons' ),
+				'tab' => Controls_Manager::TAB_CONTENT,
+				'condition' => [
+					'link_entries' => 'yes',
+					'link_type' => 'popup_action',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_dynamic_content',
+			[
+				'label' => __( 'Update Popup Content', 'soda-addons' ),
+				'type' => Controls_Manager::SWITCHER,
+				'default' => '',
+			]
+		);
+
+		$this->add_control(
+			'popup_selector_title',
+			[
+				'label' => __( 'Title Selector', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'description' => __( 'CSS selector inside the popup to place the entry title (e.g. #popup-title or .popup-title).', 'soda-addons' ),
+				'condition' => [
+					'popup_dynamic_content' => 'yes',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_selector_content',
+			[
+				'label' => __( 'Content Selector', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'description' => __( 'CSS selector to inject the full entry content.', 'soda-addons' ),
+				'condition' => [
+					'popup_dynamic_content' => 'yes',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_selector_excerpt',
+			[
+				'label' => __( 'Excerpt Selector', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'description' => __( 'CSS selector to inject the entry excerpt.', 'soda-addons' ),
+				'condition' => [
+					'popup_dynamic_content' => 'yes',
+				],
+			]
+		);
+
+		$this->add_control(
+			'popup_selector_featured_image',
+			[
+				'label' => __( 'Featured Image Selector', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'description' => __( 'CSS selector for an <img> or container to receive the featured image.', 'soda-addons' ),
+				'condition' => [
+					'popup_dynamic_content' => 'yes',
+				],
+			]
+		);
+
+		$this->end_controls_section();
+
 		// Layout Section
 		$this->start_controls_section(
 			'layout_section',
@@ -602,6 +673,267 @@ class Entry_List_Widget extends Widget_Base {
 		$popup_param_delivery = isset( $settings['popup_param_delivery'] ) ? $settings['popup_param_delivery'] : 'query';
 		$popup_action_id = isset( $settings['popup_action_id'] ) ? $settings['popup_action_id'] : '';
 		$popup_action_param_key = isset( $settings['popup_action_param_key'] ) ? $settings['popup_action_param_key'] : 'post';
+		$popup_dynamic_content = isset( $settings['popup_dynamic_content'] ) && 'yes' === $settings['popup_dynamic_content'];
+		$popup_selectors = [
+			'title' => isset( $settings['popup_selector_title'] ) ? trim( $settings['popup_selector_title'] ) : '',
+			'content' => isset( $settings['popup_selector_content'] ) ? trim( $settings['popup_selector_content'] ) : '',
+			'excerpt' => isset( $settings['popup_selector_excerpt'] ) ? trim( $settings['popup_selector_excerpt'] ) : '',
+			'featured_image' => isset( $settings['popup_selector_featured_image'] ) ? trim( $settings['popup_selector_featured_image'] ) : '',
+		];
+		$popup_selectors = array_filter( $popup_selectors );
+
+		$post_type_object = get_post_type_object( $post_type );
+
+		$popup_config = null;
+
+		if ( in_array( $link_type, [ 'popup_action', 'popup_query' ], true ) ) {
+			if ( 'popup_action' === $link_type ) {
+				$popup_id_clean = preg_replace( '/[^0-9]/', '', $popup_action_id );
+				$param_key = sanitize_key( $popup_action_param_key );
+				if ( empty( $param_key ) ) {
+					$param_key = 'post';
+				}
+
+				$popup_config = [
+					'widgetId' => $this->get_id(),
+					'popupId' => ! empty( $popup_id_clean ) ? (int) $popup_id_clean : null,
+					'paramKey' => $param_key,
+					'postType' => $post_type,
+					'delivery' => 'action',
+					'dynamic' => false,
+				];
+			} else {
+				$anchor = ! empty( $popup_anchor ) ? $popup_anchor : '#popup';
+				$param = sanitize_key( $popup_query_param );
+				if ( empty( $param ) ) {
+					$param = 'municipio_id';
+				}
+				$delivery_mode = in_array( $popup_param_delivery, [ 'query', 'data_attribute' ], true ) ? $popup_param_delivery : 'query';
+				$popup_id_from_anchor = null;
+				if ( preg_match( '/([0-9]+)/', $anchor, $matches ) ) {
+					$popup_id_from_anchor = (int) $matches[1];
+				}
+
+				$popup_config = [
+					'widgetId' => $this->get_id(),
+					'popupId' => $popup_id_from_anchor,
+					'paramKey' => $param,
+					'postType' => $post_type,
+					'delivery' => $delivery_mode,
+					'dynamic' => false,
+				];
+			}
+
+			if ( $popup_dynamic_content && ! empty( $popup_selectors ) && $post_type_object && ! empty( $post_type_object->show_in_rest ) ) {
+				$rest_namespace = ! empty( $post_type_object->rest_namespace ) ? $post_type_object->rest_namespace : 'wp/v2';
+				$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type;
+				$rest_route = rest_url( trailingslashit( sprintf( '%s/%s', trim( $rest_namespace, '/' ), trim( $rest_base, '/' ) ) ) );
+
+				$popup_config['dynamic'] = true;
+				$popup_config['restUrl'] = esc_url_raw( $rest_route );
+				$popup_config['selectors'] = $popup_selectors;
+			}
+
+			$popup_configuration_script = 'window.SodaEntryListPopupConfig = window.SodaEntryListPopupConfig || {}; window.SodaEntryListPopupConfig["' . esc_js( $this->get_id() ) . '"] = ' . wp_json_encode( $popup_config ) . ';';
+			wp_add_inline_script( 'elementor-frontend', $popup_configuration_script, 'after' );
+
+			if ( ! self::$popup_script_enqueued ) {
+				$script = <<<'JS'
+(function(){
+	if (window.SodaEntryListPopupInit) {
+		return;
+	}
+
+	window.SodaEntryListPopupInit = true;
+	window.SodaEntryListPopupConfig = window.SodaEntryListPopupConfig || {};
+	window.SodaEntryListPopupCache = window.SodaEntryListPopupCache || {};
+
+	function decodeEntities(str) {
+		var textarea = document.createElement('textarea');
+		textarea.innerHTML = str;
+		return textarea.value;
+	}
+
+	function applyData(config, data) {
+		if (!data) {
+			return;
+		}
+
+		var selectors = config.selectors || {};
+
+		if (selectors.title) {
+			document.querySelectorAll(selectors.title).forEach(function(element){
+				element.textContent = data.title && data.title.rendered ? decodeEntities(data.title.rendered) : '';
+			});
+		}
+
+		if (selectors.excerpt) {
+			document.querySelectorAll(selectors.excerpt).forEach(function(element){
+				element.innerHTML = data.excerpt && data.excerpt.rendered ? data.excerpt.rendered : '';
+			});
+		}
+
+		if (selectors.content) {
+			document.querySelectorAll(selectors.content).forEach(function(element){
+				element.innerHTML = data.content && data.content.rendered ? data.content.rendered : '';
+			});
+		}
+
+		if (selectors.featured_image) {
+			var imageUrl = '';
+			if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0] && data._embedded['wp:featuredmedia'][0].source_url) {
+				imageUrl = data._embedded['wp:featuredmedia'][0].source_url;
+			}
+
+			if (imageUrl) {
+				document.querySelectorAll(selectors.featured_image).forEach(function(element){
+					if (element.tagName === 'IMG') {
+						element.src = imageUrl;
+					} else {
+						element.style.backgroundImage = 'url(' + imageUrl + ')';
+					}
+				});
+			}
+		}
+	}
+
+	function updatePopupContent(config, postId) {
+		if (!config || !config.restUrl) {
+			return;
+		}
+
+		var cacheKey = config.postType + ':' + postId;
+		if (window.SodaEntryListPopupCache[cacheKey]) {
+			applyData(config, window.SodaEntryListPopupCache[cacheKey]);
+			return;
+		}
+
+		var url = config.restUrl + postId + '?_embed=1';
+		fetch(url, { credentials: 'same-origin' })
+			.then(function(response){
+				if (!response.ok) {
+					throw new Error('Request failed');
+				}
+				return response.json();
+			})
+			.then(function(data){
+				window.SodaEntryListPopupCache[cacheKey] = data;
+				applyData(config, data);
+			})
+			.catch(function(){
+				// Silent failure.
+			});
+	}
+
+	document.addEventListener('click', function(event){
+		var trigger = event.target.closest('[data-soda-entry-link]');
+		if (!trigger) {
+			return;
+		}
+
+		var widgetId = trigger.getAttribute('data-soda-entry-widget') || '';
+		var postId = parseInt(trigger.getAttribute('data-soda-post-id'), 10);
+
+		if (!widgetId || !postId) {
+			return;
+		}
+
+		var config = window.SodaEntryListPopupConfig[widgetId] || {};
+		var deliveryMode = config.delivery || trigger.getAttribute('data-soda-entry-delivery') || 'query';
+		var paramKey = config.paramKey || trigger.getAttribute('data-soda-param-key') || 'post';
+
+		if (deliveryMode === 'data_attribute' && paramKey) {
+			var attrName = 'data-' + paramKey.replace(/_/g, '-');
+			trigger.setAttribute(attrName, postId);
+		} else if (deliveryMode === 'query' && paramKey) {
+			try {
+				var urlObject = new URL(window.location.href);
+				urlObject.searchParams.set(paramKey, postId);
+				window.history.replaceState({}, '', urlObject.href);
+			} catch (error) {
+				var parts = window.location.href.split('#');
+				var base = parts[0];
+				var hash = parts.length > 1 ? '#' + parts.slice(1).join('#') : '';
+				var pattern = new RegExp('([?&])' + paramKey + '=([^&#]*)');
+				if (pattern.test(base)) {
+					base = base.replace(pattern, '$1' + paramKey + '=' + postId);
+				} else if (base.indexOf('?') !== -1) {
+					base = base + '&' + paramKey + '=' + postId;
+				} else {
+					base = base + '?' + paramKey + '=' + postId;
+				}
+				window.history.replaceState({}, '', base + hash);
+			}
+		}
+
+		var popupSettings = {};
+		var settingsAttr = trigger.getAttribute('data-elementor-popup-settings');
+
+		if (settingsAttr) {
+			try {
+				popupSettings = JSON.parse(settingsAttr);
+			} catch (error) {
+				popupSettings = {};
+			}
+		}
+
+		var popupId = popupSettings.id || config.popupId;
+
+		if (!popupId) {
+			var popupIdAttr = trigger.getAttribute('data-elementor-popup-id');
+			if (popupIdAttr) {
+				popupId = parseInt(popupIdAttr, 10);
+			} else {
+				var href = trigger.getAttribute('href') || '';
+				var match = href.match(/popup=([0-9]+)/);
+				if (match) {
+					popupId = parseInt(match[1], 10);
+				}
+			}
+		}
+
+		if (popupId) {
+			popupSettings.id = popupId;
+		}
+
+		if (!paramKey) {
+			paramKey = 'post';
+		}
+
+		popupSettings[paramKey] = postId;
+		popupSettings.post = postId;
+		popupSettings.postId = postId;
+		popupSettings.post_id = postId;
+
+		if (!popupSettings.dynamic || typeof popupSettings.dynamic !== 'object') {
+			popupSettings.dynamic = {};
+		}
+
+		popupSettings.dynamic[paramKey] = postId;
+		popupSettings.dynamic.post = postId;
+		popupSettings.dynamic.postId = postId;
+		popupSettings.dynamic.post_id = postId;
+
+		if (!popupSettings.id) {
+			return;
+		}
+
+		event.preventDefault();
+
+		if (typeof elementorProFrontend !== 'undefined' && elementorProFrontend.modules && elementorProFrontend.modules.popup) {
+			elementorProFrontend.modules.popup.showPopup({ id: popupSettings.id, settings: popupSettings });
+		}
+
+		if (config.dynamic) {
+			updatePopupContent(config, postId);
+		}
+	});
+})();
+JS;
+					wp_add_inline_script( 'elementor-frontend', $script, 'after' );
+					self::$popup_script_enqueued = true;
+				}
+		}
 
 		$args = [
 			'post_type' => $post_type,
@@ -630,7 +962,6 @@ class Entry_List_Widget extends Widget_Base {
 			return;
 		}
 
-		$post_type_object = get_post_type_object( $post_type );
 		if ( empty( $label_text ) && $post_type_object ) {
 			$label_text = $post_type_object->labels->name;
 		}
@@ -672,15 +1003,37 @@ class Entry_List_Widget extends Widget_Base {
 									$param = 'municipio_id';
 								}
 
+								$link_url = $anchor;
+
 								$delivery_mode = in_array( $popup_param_delivery, [ 'query', 'data_attribute' ], true ) ? $popup_param_delivery : 'query';
+								$popup_id_from_anchor = null;
+								if ( preg_match( '/([0-9]+)/', $anchor, $matches ) ) {
+									$popup_id_from_anchor = (int) $matches[1];
+								}
 
 								if ( 'data_attribute' === $delivery_mode ) {
-									$link_url = $anchor;
 									$data_attr_name = 'data-' . str_replace( '_', '-', $param );
 									$link_extra_attributes[ $data_attr_name ] = absint( $post_id );
-								} else {
-									$separator = strpos( $anchor, '?' ) === false ? '?' : '&';
-									$link_url = $anchor . $separator . rawurlencode( $param ) . '=' . absint( $post_id );
+								}
+
+								$link_extra_attributes['data-soda-entry-link'] = 'yes';
+								$link_extra_attributes['data-soda-entry-widget'] = $this->get_id();
+								$link_extra_attributes['data-soda-post-id'] = absint( $post_id );
+								$link_extra_attributes['data-soda-entry-delivery'] = $delivery_mode;
+								$link_extra_attributes['data-soda-param-key'] = $param;
+								if ( 'query' === $delivery_mode ) {
+									$link_extra_attributes['data-soda-query-param'] = $param;
+								}
+
+								if ( $popup_id_from_anchor ) {
+									$link_extra_attributes['data-elementor-open-popup'] = 'yes';
+									$link_extra_attributes['data-elementor-popup-id'] = $popup_id_from_anchor;
+									$link_extra_attributes['data-elementor-popup-settings'] = wp_json_encode(
+										[
+											'id' => $popup_id_from_anchor,
+											$param => absint( $post_id ),
+										]
+									);
 								}
 							} elseif ( 'popup_action' === $link_type ) {
 								$popup_id_clean = preg_replace( '/[^0-9]/', '', $popup_action_id );
@@ -697,6 +1050,11 @@ class Entry_List_Widget extends Widget_Base {
 										$param_key => absint( $post_id ),
 									];
 									$link_extra_attributes['data-elementor-popup-settings'] = wp_json_encode( $popup_settings );
+									$link_extra_attributes['data-soda-entry-link'] = 'yes';
+									$link_extra_attributes['data-soda-entry-widget'] = $this->get_id();
+									$link_extra_attributes['data-soda-post-id'] = absint( $post_id );
+									$link_extra_attributes['data-soda-entry-delivery'] = 'action';
+									$link_extra_attributes['data-soda-param-key'] = $param_key;
 									if ( ! self::$popup_script_enqueued ) {
 										$script = "(function(){document.addEventListener('click',function(event){var trigger=event.target.closest('[data-elementor-open-popup][data-elementor-popup-id]');if(!trigger){return;}event.preventDefault();if(window.elementorProFrontend&&elementorProFrontend.modules&&elementorProFrontend.modules.popup){var settingsAttr=trigger.getAttribute('data-elementor-popup-settings');var settings={};if(settingsAttr){try{settings=JSON.parse(settingsAttr);}catch(e){settings={};}}if(!settings.id){var idAttr=trigger.getAttribute('data-elementor-popup-id');if(idAttr){settings.id=parseInt(idAttr,10)||idAttr;}}if(settings.id){elementorProFrontend.modules.popup.showPopup({id:settings.id,settings:settings});}}});})();";
 										wp_add_inline_script( 'elementor-frontend', $script, 'after' );
