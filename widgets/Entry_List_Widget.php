@@ -262,7 +262,7 @@ class Entry_List_Widget extends Widget_Base {
 				'tab' => Controls_Manager::TAB_CONTENT,
 				'condition' => [
 					'link_entries' => 'yes',
-					'link_type' => 'popup_action',
+					'link_type' => [ 'popup_action', 'popup_query' ],
 				],
 			]
 		);
