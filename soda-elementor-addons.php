@@ -692,7 +692,11 @@ final class Elementor_Menu_Widget_V2 {
             $name = $gal_id;
         }
 
-        return $name !== '' ? esc_html($name) : '';
+        if ($name === '') {
+            return '';
+        }
+
+        return sprintf('<span class="municipio-galgdr-name">%s</span>', esc_html($name));
     }
 
     /**
@@ -728,7 +732,11 @@ final class Elementor_Menu_Widget_V2 {
             $name = $province_id;
         }
 
-        return $name !== '' ? esc_html($name) : '';
+        if ($name === '') {
+            return '';
+        }
+
+        return sprintf('<span class="municipio-provincia-name">%s</span>', esc_html($name));
     }
 }
 
