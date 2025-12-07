@@ -26,6 +26,11 @@ class Entry_List_Widget extends Widget_Base {
 	private static $popup_script_enqueued = false;
 
 	/**
+	 * Store meta keys that should be exposed through the REST API per post type.
+	 */
+	private static $rest_meta_registry = [];
+
+	/**
 	 * Get widget name.
 	 */
 	public function get_name() {
@@ -776,6 +781,7 @@ class Entry_List_Widget extends Widget_Base {
 
 			if ( ! empty( $popup_meta_fields ) ) {
 				$popup_config['meta'] = $popup_meta_fields;
+				self::ensure_rest_meta_keys( $post_type, array_keys( $popup_meta_fields ) );
 			}
 
 			if ( $popup_dynamic_content && ( ! empty( $popup_selectors ) || ! empty( $popup_meta_fields ) ) && $post_type_object && ! empty( $post_type_object->show_in_rest ) ) {
@@ -860,6 +866,8 @@ class Entry_List_Widget extends Widget_Base {
 			var value = '';
 			if (data.meta && typeof data.meta === 'object' && data.meta.hasOwnProperty(metaKey)) {
 				value = data.meta[metaKey];
+			} else if (data.hasOwnProperty(metaKey)) {
+				value = data[metaKey];
 			} else if (data.acf && typeof data.acf === 'object' && data.acf.hasOwnProperty(metaKey)) {
 				value = data.acf[metaKey];
 			}
@@ -867,7 +875,11 @@ class Entry_List_Widget extends Widget_Base {
 			if (Array.isArray(value)) {
 				value = value.join(', ');
 			} else if (value && typeof value === 'object') {
-				value = '';
+				if (Object.prototype.hasOwnProperty.call(value, 'rendered')) {
+					value = value.rendered;
+				} else {
+					value = '';
+				}
 			}
 
 			if (value === null || typeof value === 'undefined') {
@@ -1180,5 +1192,63 @@ JS;
 		<?php
 
 		wp_reset_postdata();
+	}
+
+	/**
+	 * Ensure selected meta keys are exposed through the REST API for the given post type.
+	 *
+	 * @param string $post_type Post type slug.
+	 * @param array  $meta_keys Meta keys to expose.
+	 */
+	private static function ensure_rest_meta_keys( $post_type, array $meta_keys ) {
+		$meta_keys = array_filter( array_unique( $meta_keys ) );
+		if ( empty( $meta_keys ) ) {
+			return;
+		}
+
+		if ( ! isset( self::$rest_meta_registry[ $post_type ] ) ) {
+			self::$rest_meta_registry[ $post_type ] = [];
+			add_filter( 'rest_prepare_' . $post_type, [ __CLASS__, 'inject_configured_meta' ], 10, 3 );
+		}
+
+		self::$rest_meta_registry[ $post_type ] = array_values( array_unique( array_merge( self::$rest_meta_registry[ $post_type ], $meta_keys ) ) );
+	}
+
+	/**
+	 * Append configured meta keys to the REST API response.
+	 *
+	 * @param \WP_REST_Response $response Response object.
+	 * @param \WP_Post          $post     Current post.
+	 * @param \WP_REST_Request  $request  Request object.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public static function inject_configured_meta( $response, $post, $request ) {
+		$post_type = isset( $post->post_type ) ? $post->post_type : ''; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		if ( empty( $post_type ) || empty( self::$rest_meta_registry[ $post_type ] ) ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+		if ( ! isset( $data['meta'] ) || ! is_array( $data['meta'] ) ) {
+			$data['meta'] = [];
+		}
+
+		foreach ( self::$rest_meta_registry[ $post_type ] as $meta_key ) {
+			$meta_value = get_post_meta( $post->ID, $meta_key, false );
+			if ( empty( $meta_value ) ) {
+				$data['meta'][ $meta_key ] = '';
+				continue;
+			}
+
+			if ( count( $meta_value ) === 1 ) {
+				$meta_value = $meta_value[0];
+			}
+			$data['meta'][ $meta_key ] = $meta_value;
+		}
+
+		$response->set_data( $data );
+
+		return $response;
 	}
 }
