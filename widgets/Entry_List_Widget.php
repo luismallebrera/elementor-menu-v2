@@ -7,6 +7,7 @@ use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Background;
 use Elementor\Group_Control_Border;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
+use Elementor\Repeater;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -318,6 +319,41 @@ class Entry_List_Widget extends Widget_Base {
 				'label' => __( 'Featured Image Selector', 'soda-addons' ),
 				'type' => Controls_Manager::TEXT,
 				'description' => __( 'CSS selector for an <img> or container to receive the featured image.', 'soda-addons' ),
+				'condition' => [
+					'popup_dynamic_content' => 'yes',
+				],
+			]
+		);
+
+		$meta_repeater = new Repeater();
+		$meta_repeater->add_control(
+			'popup_meta_key',
+			[
+				'label' => __( 'Meta Key', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'label_block' => true,
+				'description' => __( 'Name of the meta field to pull from the REST API (e.g. galgdr_asociado).', 'soda-addons' ),
+			]
+		);
+
+		$meta_repeater->add_control(
+			'popup_meta_selector',
+			[
+				'label' => __( 'Selector', 'soda-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'label_block' => true,
+				'description' => __( 'CSS selector inside the popup where the meta value should be injected.', 'soda-addons' ),
+			]
+		);
+
+		$this->add_control(
+			'popup_meta_fields',
+			[
+				'label' => __( 'Meta Fields', 'soda-addons' ),
+				'type' => Controls_Manager::REPEATER,
+				'fields' => $meta_repeater->get_controls(),
+				'title_field' => '{{{ popup_meta_key }}} → {{{ popup_meta_selector }}}',
+				'prevent_empty' => false,
 				'condition' => [
 					'popup_dynamic_content' => 'yes',
 				],
@@ -681,6 +717,20 @@ class Entry_List_Widget extends Widget_Base {
 			'featured_image' => isset( $settings['popup_selector_featured_image'] ) ? trim( $settings['popup_selector_featured_image'] ) : '',
 		];
 		$popup_selectors = array_filter( $popup_selectors );
+		$popup_meta_fields = [];
+		if ( ! empty( $settings['popup_meta_fields'] ) && is_array( $settings['popup_meta_fields'] ) ) {
+			foreach ( $settings['popup_meta_fields'] as $meta_item ) {
+				if ( empty( $meta_item['popup_meta_key'] ) || empty( $meta_item['popup_meta_selector'] ) ) {
+					continue;
+				}
+				$meta_key = sanitize_key( $meta_item['popup_meta_key'] );
+				$meta_selector = trim( $meta_item['popup_meta_selector'] );
+				if ( empty( $meta_key ) || empty( $meta_selector ) ) {
+					continue;
+				}
+				$popup_meta_fields[ $meta_key ] = $meta_selector;
+			}
+		}
 
 		$post_type_object = get_post_type_object( $post_type );
 
@@ -724,7 +774,11 @@ class Entry_List_Widget extends Widget_Base {
 				];
 			}
 
-			if ( $popup_dynamic_content && ! empty( $popup_selectors ) && $post_type_object && ! empty( $post_type_object->show_in_rest ) ) {
+			if ( ! empty( $popup_meta_fields ) ) {
+				$popup_config['meta'] = $popup_meta_fields;
+			}
+
+			if ( $popup_dynamic_content && ( ! empty( $popup_selectors ) || ! empty( $popup_meta_fields ) ) && $post_type_object && ! empty( $post_type_object->show_in_rest ) ) {
 				$rest_namespace = ! empty( $post_type_object->rest_namespace ) ? $post_type_object->rest_namespace : 'wp/v2';
 				$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type;
 				$rest_route = rest_url( trailingslashit( sprintf( '%s/%s', trim( $rest_namespace, '/' ), trim( $rest_base, '/' ) ) ) );
@@ -795,6 +849,39 @@ class Entry_List_Widget extends Widget_Base {
 				});
 			}
 		}
+
+		var metaSelectors = config.meta || {};
+		Object.keys(metaSelectors).forEach(function(metaKey){
+			var selector = metaSelectors[metaKey];
+			if (!selector) {
+				return;
+			}
+
+			var value = '';
+			if (data.meta && typeof data.meta === 'object' && data.meta.hasOwnProperty(metaKey)) {
+				value = data.meta[metaKey];
+			} else if (data.acf && typeof data.acf === 'object' && data.acf.hasOwnProperty(metaKey)) {
+				value = data.acf[metaKey];
+			}
+
+			if (Array.isArray(value)) {
+				value = value.join(', ');
+			} else if (value && typeof value === 'object') {
+				value = '';
+			}
+
+			if (value === null || typeof value === 'undefined') {
+				value = '';
+			}
+
+			document.querySelectorAll(selector).forEach(function(element){
+				if ('value' in element) {
+					element.value = value;
+				} else {
+					element.textContent = value;
+				}
+			});
+		});
 	}
 
 	function updatePopupContent(config, postId) {
