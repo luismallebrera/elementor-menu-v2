@@ -684,12 +684,14 @@ class Entry_List_Widget extends Widget_Base {
 									$param_key = 'post';
 								}
 								if ( ! empty( $popup_id_clean ) ) {
-									$link_url = sprintf(
-										'#elementor-action:popup=%s&%s=%d',
-										rawurlencode( $popup_id_clean ),
-										rawurlencode( $param_key ),
-										absint( $post_id )
-									);
+									$link_url = '#';
+									$link_extra_attributes['data-elementor-open-popup'] = 'yes';
+									$link_extra_attributes['data-elementor-popup-id'] = absint( $popup_id_clean );
+									$popup_settings = [
+										'id' => absint( $popup_id_clean ),
+										$param_key => absint( $post_id ),
+									];
+									$link_extra_attributes['data-elementor-popup-settings'] = wp_json_encode( $popup_settings );
 								}
 							}
 
