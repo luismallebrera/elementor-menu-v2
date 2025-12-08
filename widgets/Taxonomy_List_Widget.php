@@ -164,6 +164,16 @@ class Taxonomy_List_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'disable_empty_terms',
+			[
+				'label' => __( 'Disable Empty Terms', 'soda-addons' ),
+				'type' => Controls_Manager::SWITCHER,
+				'default' => 'yes',
+				'description' => __( 'Display empty terms without a link and mark them as disabled.', 'soda-addons' ),
+			]
+		);
+
+		$this->add_control(
 			'html_tag',
 			[
 				'label' => __( 'HTML Tag', 'soda-addons' ),
@@ -459,6 +469,51 @@ class Taxonomy_List_Widget extends Widget_Base {
 
 		$this->end_controls_tab();
 
+		// Active State
+		$this->start_controls_tab(
+			'items_active_tab',
+			[
+				'label' => __( 'Active', 'soda-addons' ),
+			]
+		);
+
+		$this->add_control(
+			'items_color_active',
+			[
+				'label' => __( 'Color', 'soda-addons' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '',
+				'selectors' => [
+					'{{WRAPPER}} .soda-taxonomy-list__item.is-active' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .soda-taxonomy-list__item.is-active a' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Background::get_type(),
+			[
+				'name' => 'items_background_active',
+				'label' => __( 'Background', 'soda-addons' ),
+				'types' => [ 'classic', 'gradient' ],
+				'selector' => '{{WRAPPER}} .soda-taxonomy-list__item.is-active',
+			]
+		);
+
+		$this->add_control(
+			'items_border_color_active',
+			[
+				'label' => __( 'Border Color', 'soda-addons' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '',
+				'selectors' => [
+					'{{WRAPPER}} .soda-taxonomy-list__item.is-active' => 'border-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
 		$this->end_controls_tabs();
 
 		$this->add_control(
@@ -560,6 +615,7 @@ class Taxonomy_List_Widget extends Widget_Base {
 		$label_text = ! empty( $settings['label_text'] ) ? $settings['label_text'] : '';
 		$separator = $settings['separator'];
 		$link_terms = $settings['link_terms'] === 'yes';
+		$disable_empty_terms = isset( $settings['disable_empty_terms'] ) ? ( 'yes' === $settings['disable_empty_terms'] ) : true;
 		$html_tag = $settings['html_tag'];
 
 		if ( ! in_array( $display_mode, [ 'current_post', 'all_terms' ], true ) ) {
@@ -607,6 +663,12 @@ class Taxonomy_List_Widget extends Widget_Base {
 
 		$this->add_render_attribute( 'wrapper', 'class', 'soda-taxonomy-list' );
 
+		$active_term_id = 0;
+		$queried_object = get_queried_object();
+		if ( $queried_object instanceof \WP_Term && $queried_object->taxonomy === $taxonomy ) {
+			$active_term_id = (int) $queried_object->term_id;
+		}
+
 		?>
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
 			<?php if ( $show_label && ! empty( $label_text ) ) : ?>
@@ -621,15 +683,30 @@ class Taxonomy_List_Widget extends Widget_Base {
 				$counter = 0;
 				
 				foreach ( $terms as $term ) :
+					$term_id = (int) $term->term_id;
+					$term_has_posts = ( isset( $term->count ) && (int) $term->count > 0 );
+					$is_disabled = $disable_empty_terms && ! $term_has_posts;
+					$is_active = ( $active_term_id && $term_id === $active_term_id );
+					$item_classes = [ 'soda-taxonomy-list__item' ];
+					if ( $is_active ) {
+						$item_classes[] = 'is-active';
+					}
+					if ( $is_disabled ) {
+						$item_classes[] = 'is-disabled';
+					}
+					$item_class_attr = implode( ' ', array_map( 'sanitize_html_class', $item_classes ) );
+					$item_extra_attr = $is_disabled ? ' aria-disabled="true"' : '';
+					$term_name = $term->name;
+					$term_url = get_term_link( $term );
 					$counter++;
 					?>
-					<span class="soda-taxonomy-list__item">
-						<?php if ( $link_terms ) : ?>
-							<a href="<?php echo esc_url( get_term_link( $term ) ); ?>">
-								<?php echo esc_html( $term->name ); ?>
+					<span class="<?php echo esc_attr( $item_class_attr ); ?>"<?php echo $item_extra_attr; ?>>
+						<?php if ( $link_terms && ! $is_disabled && ! is_wp_error( $term_url ) ) : ?>
+							<a href="<?php echo esc_url( $term_url ); ?>"<?php echo $is_active ? ' aria-current="page"' : ''; ?>>
+								<?php echo esc_html( $term_name ); ?>
 							</a>
 						<?php else : ?>
-							<?php echo esc_html( $term->name ); ?>
+							<?php echo esc_html( $term_name ); ?>
 						<?php endif; ?>
 					</span>
 					<?php if ( $counter < $terms_count && ! empty( $separator ) ) : ?>
