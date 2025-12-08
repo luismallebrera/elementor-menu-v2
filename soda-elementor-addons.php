@@ -608,6 +608,7 @@ final class Elementor_Menu_Widget_V2 {
      * Register shortcodes to expose municipio related data inside popups.
      */
     private function register_municipio_shortcodes() {
+        add_shortcode('municipio_title', [$this, 'shortcode_municipio_title']);
         add_shortcode('municipio_galgdr_name', [$this, 'shortcode_municipio_galgdr_name']);
         add_shortcode('municipio_provincia_name', [$this, 'shortcode_municipio_provincia_name']);
     }
@@ -737,6 +738,31 @@ final class Elementor_Menu_Widget_V2 {
         }
 
         return sprintf('<span class="municipio-provincia-name">%s</span>', esc_html($name));
+    }
+
+    /**
+     * Shortcode callback that renders the municipio title.
+     *
+     * @param array $atts Shortcode attributes.
+     * @return string
+     */
+    public function shortcode_municipio_title($atts = []) {
+        $municipio_id = $this->resolve_municipio_context_id($atts);
+        if (!$municipio_id) {
+            return '';
+        }
+
+        $post = get_post($municipio_id);
+        if (!($post instanceof \WP_Post) || $post->post_type !== 'municipio') {
+            return '';
+        }
+
+        $title = get_the_title($post);
+        if (! $title) {
+            return '';
+        }
+
+        return sprintf('<span class="municipio-title">%s</span>', esc_html($title));
     }
 }
 
