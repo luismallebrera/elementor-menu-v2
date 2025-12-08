@@ -159,6 +159,9 @@ class Arrow_Button_Widget extends Widget_Base {
 					'is_external' => false,
 					'nofollow' => false,
 				],
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
