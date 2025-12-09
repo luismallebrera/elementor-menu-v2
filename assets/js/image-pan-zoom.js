@@ -194,6 +194,17 @@
 			}
 		}
 
+		function observeResizeTarget(target) {
+			if (typeof window.ResizeObserver === 'undefined' || !target) {
+				return null;
+			}
+			var observer = new ResizeObserver(function () {
+				handleResize();
+			});
+			observer.observe(target);
+			return observer;
+		}
+
 		viewport.addEventListener('pointerdown', handlePointerDown, { passive: false });
 		viewport.addEventListener('pointermove', handlePointerMove, { passive: false });
 		viewport.addEventListener('pointerup', handlePointerUp);
@@ -233,6 +244,10 @@
 		});
 
 		window.addEventListener('resize', handleResize);
+		var resizeObserver = observeResizeTarget(viewport);
+		requestAnimationFrame(function () {
+			handleResize();
+		});
 	}
 
 	function registerElementorHook() {
