@@ -58,7 +58,7 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'label' => __( 'Image', 'soda-addons' ),
 				'type' => Controls_Manager::MEDIA,
 				'default' => [
-					'url' => Controls_Manager::get_placeholder_image_src(),
+					'url' => \Elementor\Utils::get_placeholder_image_src(),
 				],
 			]
 		);
