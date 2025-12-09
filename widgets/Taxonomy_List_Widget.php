@@ -108,6 +108,19 @@ class Taxonomy_List_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'selected_terms',
+			[
+				'label' => __( 'Select Terms', 'soda-addons' ),
+				'type' => Controls_Manager::SELECT2,
+				'label_block' => true,
+				'multiple' => true,
+				'options' => $this->get_terms_options_for_select(),
+				'description' => __( 'Choose specific terms to display. Leave empty to include all terms for the selected taxonomy.', 'soda-addons' ),
+				'default' => [],
+			]
+		);
+
+		$this->add_control(
 			'display_mode',
 			[
 				'label' => __( 'Display Mode', 'soda-addons' ),
@@ -601,6 +614,68 @@ class Taxonomy_List_Widget extends Widget_Base {
 	}
 
 	/**
+	 * Get term options formatted for the select control.
+	 *
+	 * @since 2.3.0
+	 * @access private
+	 *
+	 * @return array
+	 */
+	private function get_terms_options_for_select() {
+		$options = [];
+		$taxonomies = $this->get_taxonomies_options();
+
+		foreach ( $taxonomies as $taxonomy => $label ) {
+			$terms = get_terms( [
+				'taxonomy' => $taxonomy,
+				'hide_empty' => false,
+			] );
+
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				continue;
+			}
+
+			foreach ( $terms as $term ) {
+				$key = $taxonomy . '|' . $term->term_id;
+				$options[ $key ] = sprintf( '%s: %s', $label, $term->name );
+			}
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Normalize selected term control values.
+	 *
+	 * @since 2.3.0
+	 * @access private
+	 *
+	 * @param array $selected_terms Selected control values.
+	 * @param string $expected_taxonomy Current taxonomy.
+	 *
+	 * @return array
+	 */
+	private function normalize_selected_term_ids( $selected_terms, $expected_taxonomy ) {
+		$normalized = [];
+
+		foreach ( (array) $selected_terms as $selected_term ) {
+			if ( is_numeric( $selected_term ) ) {
+				$normalized[] = (int) $selected_term;
+				continue;
+			}
+
+			if ( is_string( $selected_term ) && strpos( $selected_term, '|' ) !== false ) {
+				list( $taxonomy, $term_id ) = explode( '|', $selected_term );
+				if ( $taxonomy === $expected_taxonomy && is_numeric( $term_id ) ) {
+					$normalized[] = (int) $term_id;
+				}
+			}
+		}
+
+		return array_values( array_unique( $normalized ) );
+	}
+
+	/**
 	 * Render widget output on the frontend.
 	 *
 	 * @since 2.3.0
@@ -653,6 +728,36 @@ class Taxonomy_List_Widget extends Widget_Base {
 				}
 				return;
 			}
+		}
+
+		$selected_term_ids = $this->normalize_selected_term_ids(
+			isset( $settings['selected_terms'] ) ? $settings['selected_terms'] : [],
+			$taxonomy
+		);
+
+		if ( ! empty( $selected_term_ids ) ) {
+			$selection_order = array_flip( $selected_term_ids );
+			$terms = array_values( array_filter( $terms, function( $term ) use ( $selected_term_ids ) {
+				return in_array( (int) $term->term_id, $selected_term_ids, true );
+			} ) );
+
+			if ( empty( $terms ) ) {
+				if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
+					echo '<div class="soda-taxonomy-list__message">' . __( 'None of the selected terms are available for this taxonomy.', 'soda-addons' ) . '</div>';
+				}
+				return;
+			}
+
+			usort( $terms, function( $a, $b ) use ( $selection_order ) {
+				$a_id = (int) $a->term_id;
+				$b_id = (int) $b->term_id;
+				$a_pos = isset( $selection_order[ $a_id ] ) ? $selection_order[ $a_id ] : PHP_INT_MAX;
+				$b_pos = isset( $selection_order[ $b_id ] ) ? $selection_order[ $b_id ] : PHP_INT_MAX;
+				if ( $a_pos === $b_pos ) {
+					return strcasecmp( $a->name, $b->name );
+				}
+				return ( $a_pos < $b_pos ) ? -1 : 1;
+			} );
 		}
 
 		// Get taxonomy object for label
