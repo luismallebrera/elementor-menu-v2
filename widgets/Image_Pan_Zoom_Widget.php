@@ -107,9 +107,9 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [],
 				'range' => [
 					'px' => [
-						' min' => 0.5,
-						' max' => 3,
-						' step' => 0.1,
+						'min' => 0.5,
+						'max' => 3,
+						'step' => 0.1,
 					],
 				],
 				'default' => [
@@ -126,9 +126,9 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [],
 				'range' => [
 					'px' => [
-						' min' => 0.1,
-						' max' => 1,
-						' step' => 0.05,
+						'min' => 0.1,
+						'max' => 1,
+						'step' => 0.05,
 					],
 				],
 				'default' => [
@@ -145,9 +145,9 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [],
 				'range' => [
 					'px' => [
-						' min' => 1,
-						' max' => 6,
-						' step' => 0.1,
+						'min' => 1,
+						'max' => 6,
+						'step' => 0.1,
 					],
 				],
 				'default' => [
@@ -164,9 +164,9 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [],
 				'range' => [
 					'px' => [
-						' min' => 0.05,
-						' max' => 1,
-						' step' => 0.05,
+						'min' => 0.05,
+						'max' => 1,
+						'step' => 0.05,
 					],
 				],
 				'default' => [
@@ -183,14 +183,14 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [ 'px', 'vh' ],
 				'range' => [
 					'px' => [
-						' min' => 100,
-						' max' => 1200,
-						' step' => 10,
+						'min' => 100,
+						'max' => 1200,
+						'step' => 10,
 					],
 					'vh' => [
-						' min' => 20,
-						' max' => 100,
-						' step' => 1,
+						'min' => 20,
+						'max' => 100,
+						'step' => 1,
 					],
 				],
 				'default' => [
@@ -309,9 +309,9 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [ 'px' ],
 				'range' => [
 					'px' => [
-						' min' => -100,
-						' max' => 100,
-						' step' => 1,
+						'min' => -100,
+						'max' => 100,
+						'step' => 1,
 					],
 				],
 				'default' => [
@@ -328,9 +328,9 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [ 'px' ],
 				'range' => [
 					'px' => [
-						' min' => -100,
-						' max' => 100,
-						' step' => 1,
+						'min' => -100,
+						'max' => 100,
+						'step' => 1,
 					],
 				],
 				'default' => [
@@ -418,9 +418,9 @@ class Image_Pan_Zoom_Widget extends Widget_Base {
 				'size_units' => [ 'px' ],
 				'range' => [
 					'px' => [
-						' min' => 0,
-						' max' => 40,
-						' step' => 1,
+						'min' => 0,
+						'max' => 40,
+						'step' => 1,
 					],
 				],
 				'default' => [

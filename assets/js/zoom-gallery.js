@@ -3,7 +3,11 @@ gsap.utils.toArray('.zoom-gallery').forEach((zoomGallery) => {
 	const zoomWrapperThumb = zoomGallery.querySelector(".zoom-wrapper-thumb");
 	const ZoomItem = zoomGallery.querySelector(".zoom-center .zoom-img-wrapper");
 	const zoomImgsWrapper = zoomGallery.querySelectorAll('li:not(.zoom-center) .zoom-img-wrapper');
-	const heightRatio = zoomGalleryWrapper.dataset.heightratio;  
+
+	if (!zoomGalleryWrapper || !zoomWrapperThumb || !ZoomItem) {
+		return;
+	}
+	const heightRatio = parseFloat(zoomGalleryWrapper.dataset.heightratio) || 1;
 	const zoomImgsHeight = ZoomItem.offsetWidth * heightRatio;
 	const paddingBottom = (window.innerHeight - zoomImgsHeight) / 2;
 	
