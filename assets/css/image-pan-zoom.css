@@ -1,0 +1,67 @@
+.soda-image-pan-zoom {
+	position: relative;
+	overflow: hidden;
+}
+
+.soda-image-pan-zoom:focus {
+	outline: 2px solid rgba(0, 0, 0, 0.3);
+	outline-offset: 2px;
+}
+
+.soda-image-pan-zoom__viewport {
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	cursor: grab;
+	touch-action: none;
+}
+
+.soda-image-pan-zoom__viewport.is-dragging {
+	cursor: grabbing;
+}
+
+.soda-image-pan-zoom__inner {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform-origin: top left;
+}
+
+.soda-image-pan-zoom__inner img {
+	display: block;
+	max-width: none;
+	user-select: none;
+	pointer-events: none;
+}
+
+.soda-image-pan-zoom__controls {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	z-index: 2;
+}
+
+.soda-image-pan-zoom__controls.is-hidden {
+	display: none;
+}
+
+.soda-image-pan-zoom__button {
+	width: 36px;
+	height: 36px;
+	border: none;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.6);
+	color: #fff;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.soda-image-pan-zoom__button:hover,
+.soda-image-pan-zoom__button:focus {
+	background: rgba(0, 0, 0, 0.8);
+	outline: none;
+}

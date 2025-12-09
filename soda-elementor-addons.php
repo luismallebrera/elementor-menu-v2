@@ -270,6 +270,13 @@ final class Elementor_Menu_Widget_V2 {
             self::VERSION
         );
 
+        wp_register_style(
+            'soda-image-pan-zoom',
+            plugins_url('assets/css/image-pan-zoom.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
         // Liquid Glass
         wp_register_style(
             'soda-liquid-glass',
@@ -393,6 +400,14 @@ final class Elementor_Menu_Widget_V2 {
             'soda-lottie-widget',
             plugins_url('assets/js/lottie-player.js', __FILE__),
             ['jquery'],
+            self::VERSION,
+            true
+        );
+
+        wp_register_script(
+            'soda-image-pan-zoom',
+            plugins_url('assets/js/image-pan-zoom.js', __FILE__),
+            [ 'elementor-frontend' ],
             self::VERSION,
             true
         );
