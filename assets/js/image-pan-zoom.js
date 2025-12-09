@@ -156,19 +156,23 @@
 		});
 	}
 
-	function onElementorFrontendReady() {
-		if (typeof elementorFrontend === 'undefined') {
+	function registerElementorHook() {
+		if (typeof window.elementorFrontend === 'undefined' || !window.elementorFrontend.hooks || typeof window.elementorFrontend.hooks.addAction !== 'function') {
 			return;
 		}
 
-		elementorFrontend.hooks.addAction('frontend/element_ready/soda-image-pan-zoom.default', function ($scope) {
+		window.elementorFrontend.hooks.addAction('frontend/element_ready/soda-image-pan-zoom.default', function ($scope) {
 			initPanZoom($scope);
 		});
 	}
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', onElementorFrontendReady);
+	if (typeof window.jQuery !== 'undefined') {
+		window.jQuery(window).on('elementor/frontend/init', registerElementorHook);
 	} else {
-		onElementorFrontendReady();
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', registerElementorHook);
+		} else {
+			registerElementorHook();
+		}
 	}
 })();
