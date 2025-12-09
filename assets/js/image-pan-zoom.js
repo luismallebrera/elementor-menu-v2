@@ -44,7 +44,7 @@
 		var minZoom = isNaN(minZoomAttr) ? 1 : minZoomAttr;
 		var maxZoom = isNaN(maxZoomAttr) ? 4 : maxZoomAttr;
 		var initialZoom = isNaN(initialZoomAttr) ? minZoom : initialZoomAttr;
-		var step = isNaN(stepAttr) ? 0.2 : stepAttr;
+		var step = isNaN(stepAttr) ? 0.2 : Math.abs(stepAttr);
 
 		if (minZoom <= 0) {
 			minZoom = 0.1;
@@ -74,6 +74,8 @@
 		var startY = 0;
 		var initialX = 0;
 		var initialY = 0;
+
+		setTransform(state);
 
 		function updateImageDimensions() {
 			if (!image) {
@@ -192,8 +194,8 @@
 			}
 		}
 
-		viewport.addEventListener('pointerdown', handlePointerDown);
-		viewport.addEventListener('pointermove', handlePointerMove);
+		viewport.addEventListener('pointerdown', handlePointerDown, { passive: false });
+		viewport.addEventListener('pointermove', handlePointerMove, { passive: false });
 		viewport.addEventListener('pointerup', handlePointerUp);
 		viewport.addEventListener('pointerleave', handlePointerUp);
 		viewport.addEventListener('pointercancel', handlePointerUp);
