@@ -29,16 +29,31 @@
 
 		var viewport = container.querySelector('.soda-image-pan-zoom__viewport');
 		var inner = container.querySelector('.soda-image-pan-zoom__inner');
+		var image = inner ? inner.querySelector('img') : null;
 		if (!viewport || !inner) {
 			return;
 		}
 
 		var enableWheel = container.getAttribute('data-enable-wheel') === 'true';
 		var enableDrag = container.getAttribute('data-enable-drag') === 'true';
-		var minZoom = parseFloat(container.getAttribute('data-min-zoom')) || 1;
-		var maxZoom = parseFloat(container.getAttribute('data-max-zoom')) || 4;
-		var initialZoom = parseFloat(container.getAttribute('data-initial-zoom')) || 1;
-		var step = parseFloat(container.getAttribute('data-zoom-step')) || 0.2;
+		var minZoomAttr = parseFloat(container.getAttribute('data-min-zoom'));
+		var maxZoomAttr = parseFloat(container.getAttribute('data-max-zoom'));
+		var initialZoomAttr = parseFloat(container.getAttribute('data-initial-zoom'));
+		var stepAttr = parseFloat(container.getAttribute('data-zoom-step'));
+
+		var minZoom = isNaN(minZoomAttr) ? 1 : minZoomAttr;
+		var maxZoom = isNaN(maxZoomAttr) ? 4 : maxZoomAttr;
+		var initialZoom = isNaN(initialZoomAttr) ? minZoom : initialZoomAttr;
+		var step = isNaN(stepAttr) ? 0.2 : stepAttr;
+
+		if (minZoom <= 0) {
+			minZoom = 0.1;
+		}
+		if (maxZoom <= minZoom) {
+			maxZoom = minZoom + 0.5;
+		}
+		initialZoom = clamp(initialZoom, minZoom, maxZoom);
+		step = Math.max(0.01, step);
 
 		var rect = viewport.getBoundingClientRect();
 		var state = {
@@ -48,7 +63,10 @@
 			y: 0,
 			minZoom: minZoom,
 			maxZoom: maxZoom,
-			step: step
+			step: step,
+			hasInteracted: false,
+			imageWidth: 0,
+			imageHeight: 0
 		};
 
 		var isPointerDown = false;
@@ -57,13 +75,57 @@
 		var initialX = 0;
 		var initialY = 0;
 
-		setTransform(state);
+		function updateImageDimensions() {
+			if (!image) {
+				return;
+			}
+			state.imageWidth = image.naturalWidth || image.width || inner.offsetWidth;
+			state.imageHeight = image.naturalHeight || image.height || inner.offsetHeight;
+			if (state.imageWidth === 0 || state.imageHeight === 0) {
+				var bounds = inner.getBoundingClientRect();
+				if (bounds.width && bounds.height) {
+					state.imageWidth = bounds.width / state.scale;
+					state.imageHeight = bounds.height / state.scale;
+				}
+			}
+		}
+
+		function centerImage() {
+			if (!image) {
+				setTransform(state);
+				return;
+			}
+			var viewportRect = viewport.getBoundingClientRect();
+			var scaledWidth = state.imageWidth * state.scale;
+			var scaledHeight = state.imageHeight * state.scale;
+			state.x = (viewportRect.width - scaledWidth) / 2;
+			state.y = (viewportRect.height - scaledHeight) / 2;
+			setTransform(state);
+		}
+
+		function initializeLayout() {
+			updateImageDimensions();
+			centerImage();
+		}
+
+		if (image) {
+			if (image.complete) {
+				initializeLayout();
+			} else {
+				image.addEventListener('load', initializeLayout, { once: true });
+				image.addEventListener('error', initializeLayout, { once: true });
+			}
+		} else {
+			setTransform(state);
+		}
 
 		function handlePointerDown(event) {
 			if (!enableDrag) {
 				return;
 			}
+			event.preventDefault();
 			isPointerDown = true;
+			state.hasInteracted = true;
 			viewport.classList.add('is-dragging');
 			startX = event.clientX;
 			startY = event.clientY;
@@ -72,12 +134,16 @@
 			if (typeof viewport.setPointerCapture === 'function') {
 				viewport.setPointerCapture(event.pointerId);
 			}
+			if (typeof viewport.focus === 'function') {
+				viewport.focus();
+			}
 		}
 
 		function handlePointerMove(event) {
 			if (!isPointerDown) {
 				return;
 			}
+			event.preventDefault();
 			var deltaX = event.clientX - startX;
 			var deltaY = event.clientY - startY;
 			state.x = initialX + deltaX;
@@ -101,6 +167,7 @@
 				return;
 			}
 			event.preventDefault();
+			state.hasInteracted = true;
 			rect = viewport.getBoundingClientRect();
 			var offsetX = event.clientX - rect.left - state.x;
 			var offsetY = event.clientY - rect.top - state.y;
@@ -114,7 +181,15 @@
 			var centerX = rect.width / 2;
 			var centerY = rect.height / 2;
 			var nextScale = state.scale + delta;
+			state.hasInteracted = true;
 			updateScale(state, nextScale, centerX, centerY);
+		}
+
+		function handleResize() {
+			updateImageDimensions();
+			if (!state.hasInteracted) {
+				centerImage();
+			}
 		}
 
 		viewport.addEventListener('pointerdown', handlePointerDown);
@@ -154,6 +229,8 @@
 				zoom(-state.step);
 			}
 		});
+
+		window.addEventListener('resize', handleResize);
 	}
 
 	function registerElementorHook() {
