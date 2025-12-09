@@ -158,21 +158,25 @@
 
 	function registerElementorHook() {
 		if (typeof window.elementorFrontend === 'undefined' || !window.elementorFrontend.hooks || typeof window.elementorFrontend.hooks.addAction !== 'function') {
-			return;
+			return false;
 		}
 
 		window.elementorFrontend.hooks.addAction('frontend/element_ready/soda-image-pan-zoom.default', function ($scope) {
 			initPanZoom($scope);
 		});
+
+		return true;
+	}
+
+	function waitForElementor() {
+		if (!registerElementorHook()) {
+			window.requestAnimationFrame(waitForElementor);
+		}
 	}
 
 	if (typeof window.jQuery !== 'undefined') {
 		window.jQuery(window).on('elementor/frontend/init', registerElementorHook);
-	} else {
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', registerElementorHook);
-		} else {
-			registerElementorHook();
-		}
 	}
+
+	waitForElementor();
 })();

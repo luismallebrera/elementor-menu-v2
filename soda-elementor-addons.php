@@ -148,14 +148,12 @@ final class Elementor_Menu_Widget_V2 {
     public function register_widgets($widgets_manager) {
         // Auto-load all widgets from the widgets directory
         $widgets_dir = __DIR__ . '/widgets/';
-        
         if (is_dir($widgets_dir)) {
             $widget_files = glob($widgets_dir . '*.php');
             
             foreach ($widget_files as $widget_file) {
-                require_once($widget_file);
-                
                 $filename = basename($widget_file, '.php');
+                   require_once($widget_file);
                 
                 // Handle menu-toggle-widget-v2.php (legacy naming without namespace)
                 if ($filename === 'menu-toggle-widget-v2') {
