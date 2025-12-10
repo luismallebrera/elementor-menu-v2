@@ -46,11 +46,13 @@
 }
 
 .soda-alist__item-link,
-.soda-alist__content {
+
+.soda-alist__item-link {
     display: inline-flex;
     align-items: center;
     width: 100%;
     text-decoration: none;
+    gap: 0.75em;
 }
 
 .soda-alist__icon {
@@ -59,6 +61,7 @@
     justify-content: center;
     line-height: 1;
     margin-right: 0.5em;
+    flex-shrink: 0;
 }
 
 .soda-alist--icon-right .soda-alist__icon {
@@ -68,9 +71,11 @@
 }
 
 .soda-alist__text {
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     gap: 0.25em;
+    width: 100%;
+    flex: 1 1 auto;
 }
 
 .soda-alist__title {
@@ -86,6 +91,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.5em;
+}
+
+.soda-alist__content-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
 }
 
 .soda-alist__rich-text > * {

@@ -235,6 +235,32 @@ class List_Widget extends Widget_Base {
             ]
         );
 
+        $this->add_responsive_control(
+            'content_vertical_alignment',
+            [
+                'label' => __('Item Vertical Alignment', 'soda-elementor-addons'),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'flex-start' => [
+                        'title' => __('Top', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-top',
+                    ],
+                    'center' => [
+                        'title' => __('Middle', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-middle',
+                    ],
+                    'flex-end' => [
+                        'title' => __('Bottom', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-bottom',
+                    ],
+                ],
+                'default' => 'center',
+                'selectors' => [
+                    '{{WRAPPER}} .soda-alist__item-link' => 'align-items: {{VALUE}};',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
 
         $this->start_controls_section(
@@ -335,7 +361,7 @@ class List_Widget extends Widget_Base {
             Group_Control_Typography::get_type(),
             [
                 'name' => 'title_typography',
-                'selector' => '{{WRAPPER}} .soda-alist__title',
+                'selector' => '{{WRAPPER}} .soda-alist__title, {{WRAPPER}} .soda-alist__item-link--source-text .soda-alist__rich-text',
             ]
         );
 
@@ -355,6 +381,8 @@ class List_Widget extends Widget_Base {
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .soda-alist__title' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link--source-text .soda-alist__rich-text' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link--source-text .soda-alist__rich-text > *:not(.soda-alist__sublist)' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -375,6 +403,8 @@ class List_Widget extends Widget_Base {
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .soda-alist__item-link:hover .soda-alist__title' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link--source-text:hover .soda-alist__rich-text' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link--source-text:hover .soda-alist__rich-text > *:not(.soda-alist__sublist)' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -386,7 +416,7 @@ class List_Widget extends Widget_Base {
             Group_Control_Typography::get_type(),
             [
                 'name' => 'description_typography',
-                'selector' => '{{WRAPPER}} .soda-alist__description',
+                'selector' => '{{WRAPPER}} .soda-alist__description, {{WRAPPER}} .soda-alist__item-link--source-text .soda-alist__rich-text > p, {{WRAPPER}} .soda-alist__item-link--source-text .soda-alist__rich-text > span',
                 'separator' => 'before',
             ]
         );
@@ -398,6 +428,8 @@ class List_Widget extends Widget_Base {
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .soda-alist__description' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link--source-text .soda-alist__rich-text > p' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link--source-text .soda-alist__rich-text > span' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -520,6 +552,32 @@ class List_Widget extends Widget_Base {
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .soda-alist__icon' => 'font-size: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'icon_vertical_alignment',
+            [
+                'label' => __('Icon Vertical Alignment', 'soda-elementor-addons'),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'flex-start' => [
+                        'title' => __('Top', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-top',
+                    ],
+                    'center' => [
+                        'title' => __('Middle', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-middle',
+                    ],
+                    'flex-end' => [
+                        'title' => __('Bottom', 'soda-elementor-addons'),
+                        'icon' => 'eicon-v-align-bottom',
+                    ],
+                ],
+                'default' => 'center',
+                'selectors' => [
+                    '{{WRAPPER}} .soda-alist__icon' => 'align-self: {{VALUE}};',
                 ],
             ]
         );
@@ -672,7 +730,7 @@ class List_Widget extends Widget_Base {
                 $has_icon = !empty($icon) && !empty($icon['value']);
                 $item_html = isset($item['html']) ? $item['html'] : '';
                 $has_sublist = !empty($item['has_sublist']);
-                $this->add_render_attribute($link_key, 'class', 'soda-alist__item-link');
+                $this->add_render_attribute($link_key, 'class', ['soda-alist__item-link', 'soda-alist__item-link--source-text']);
             } else {
                 $icon = !empty($item['item_icon']['value']) ? $item['item_icon'] : $global_icon;
                 $has_icon = !empty($icon) && !empty($icon['value']);
@@ -709,12 +767,18 @@ class List_Widget extends Widget_Base {
                     echo '<div class="soda-alist__rich-text">' . $item_html . '</div>';
                 }
             } else {
-                if (!empty($item_title)) {
-                    echo '<span class="soda-alist__title">' . $item_title . '</span>';
-                }
+                if (!empty($item_title) || !empty($item_description)) {
+                    echo '<div class="soda-alist__content-text">';
 
-                if (!empty($item_description)) {
-                    echo '<span class="soda-alist__description">' . $item_description . '</span>';
+                    if (!empty($item_title)) {
+                        echo '<span class="soda-alist__title">' . $item_title . '</span>';
+                    }
+
+                    if (!empty($item_description)) {
+                        echo '<span class="soda-alist__description">' . $item_description . '</span>';
+                    }
+
+                    echo '</div>';
                 }
             }
 
@@ -827,6 +891,23 @@ class List_Widget extends Widget_Base {
         $html = trim($html);
 
         if ($html === '') {
+            return $items;
+        }
+
+        if (!class_exists('\DOMDocument')) {
+            if (preg_match_all('/<li\b[^>]*>(.*?)<\/li>/is', $html, $matches)) {
+                foreach ($matches[1] as $content) {
+                    $sanitized = $this->sanitize_list_item_html($content);
+
+                    if ($sanitized !== '') {
+                        $items[] = [
+                            'html' => $sanitized,
+                            'has_sublist' => $this->contains_sublist($sanitized),
+                        ];
+                    }
+                }
+            }
+
             return $items;
         }
 
