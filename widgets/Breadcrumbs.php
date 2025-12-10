@@ -597,11 +597,26 @@ class Breadcrumbs extends Widget_Base {
      * Shorten text
      */
     private function shorten_text($text, $max_length, $suffix = '...') {
-        if (mb_strlen($text) <= $max_length) {
+        $text = trim(wp_strip_all_tags($text));
+
+        if ($max_length <= 0 || mb_strlen($text, 'UTF-8') <= $max_length) {
             return $text;
         }
-        
-        return mb_substr($text, 0, $max_length) . $suffix;
+
+        $trimmed = mb_substr($text, 0, $max_length, 'UTF-8');
+
+        $last_space = mb_strrpos($trimmed, ' ', 0, 'UTF-8');
+        if ($last_space !== false) {
+            $trimmed = mb_substr($trimmed, 0, $last_space, 'UTF-8');
+        }
+
+        $trimmed = rtrim($trimmed, " \t\n\r\0\x0B.,;:-_/");
+
+        if ($trimmed === '') {
+            $trimmed = rtrim(mb_substr($text, 0, $max_length, 'UTF-8'));
+        }
+
+        return $trimmed . $suffix;
     }
 
     /**
