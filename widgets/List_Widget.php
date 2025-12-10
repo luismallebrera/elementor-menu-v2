@@ -256,7 +256,7 @@ class List_Widget extends Widget_Base {
                 ],
                 'default' => 'center',
                 'selectors' => [
-                    '{{WRAPPER}} .soda-alist__item-link' => 'align-items: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link' => 'align-items: {{VALUE}} !important;',
                 ],
             ]
         );
@@ -577,7 +577,7 @@ class List_Widget extends Widget_Base {
                 ],
                 'default' => 'center',
                 'selectors' => [
-                    '{{WRAPPER}} .soda-alist__icon' => 'align-self: {{VALUE}};',
+                    '{{WRAPPER}} .soda-alist__item-link .soda-alist__icon' => 'align-items: {{VALUE}} !important;',
                 ],
             ]
         );

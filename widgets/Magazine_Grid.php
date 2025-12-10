@@ -657,6 +657,36 @@ class Magazine_Grid extends Widget_Base {
         );
 
         $this->add_control(
+            'title_source',
+            [
+                'label' => __('Title Source', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'post_title' => __('Default Post Title', 'soda-elementor-addons'),
+                    'custom_field' => __('Custom Field', 'soda-elementor-addons'),
+                ],
+                'default' => 'post_title',
+                'condition' => [
+                    'show_title' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'custom_title_field',
+            [
+                'label' => __('Custom Field Key', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '_slider_titulo_slider',
+                'description' => __('Enter the meta key to use when pulling the title from a custom field. The widget falls back to the default title if the field is empty.', 'soda-elementor-addons'),
+                'condition' => [
+                    'show_title' => 'yes',
+                    'title_source' => 'custom_field',
+                ],
+            ]
+        );
+
+        $this->add_control(
             'show_excerpt',
             [
                 'label' => __('Show Excerpt', 'soda-elementor-addons'),
@@ -1361,6 +1391,38 @@ class Magazine_Grid extends Widget_Base {
     }
 
     /**
+     * Determine which title should be displayed for the current post.
+     */
+    private function resolve_post_title($post_id, $settings) {
+        $title = get_the_title($post_id);
+
+        if (!empty($settings['title_source']) && $settings['title_source'] === 'custom_field') {
+            $meta_key = !empty($settings['custom_title_field']) ? $settings['custom_title_field'] : '_slider_titulo_slider';
+
+            if (!empty($meta_key)) {
+                $meta_value = get_post_meta($post_id, $meta_key, true);
+
+                if (is_array($meta_value)) {
+                    $meta_value = implode(' ', array_filter(array_map('trim', $meta_value)));
+                }
+
+                if (is_string($meta_value)) {
+                    $meta_value = trim($meta_value);
+
+                    if ($meta_value !== '') {
+                        $title = $meta_value;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Allow developers to filter the resolved title before output.
+         */
+        return apply_filters('soda_magazine_grid_resolved_title', $title, $post_id, $settings);
+    }
+
+    /**
      * Get custom excerpt
      */
     private function get_excerpt($length = 20) {
@@ -1638,12 +1700,14 @@ class Magazine_Grid extends Widget_Base {
                     continue;
                 }
                 
+                $display_title = $this->resolve_post_title(get_the_ID(), $settings);
+                $normalized_title = trim(wp_strip_all_tags($display_title));
+
                 // Skip posts with empty/default titles if option is enabled
                 if ($settings['hide_empty_title'] === 'yes') {
-                    $post_title = trim(get_the_title());
                     $empty_titles = ['sin título', 'sin titulo', 'untitled', '(no title)', 'auto draft', ''];
-                    
-                    if (empty($post_title) || in_array(strtolower($post_title), $empty_titles)) {
+
+                    if ($normalized_title === '' || in_array(strtolower($normalized_title), $empty_titles, true)) {
                         continue;
                     }
                 }
@@ -1706,9 +1770,9 @@ class Magazine_Grid extends Widget_Base {
                             </div>
                         <?php endif; ?>
                         
-                        <?php if ($settings['show_title'] === 'yes') : ?>
+                        <?php if ($settings['show_title'] === 'yes' && $normalized_title !== '') : ?>
                             <<?php echo esc_attr($settings['title_tag']); ?> class="ue-grid-item-title">
-                                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                                <a href="<?php echo esc_url(get_permalink()); ?>"><?php echo esc_html($display_title); ?></a>
                             </<?php echo esc_attr($settings['title_tag']); ?>>
                         <?php endif; ?>
                         

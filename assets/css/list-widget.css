@@ -113,5 +113,5 @@
 }
 
 .soda-alist__item--has-sublist .soda-alist__rich-text > .soda-alist__sublist {
-    margin-top: 0.75em;
+    margin-top: 0;
 }
