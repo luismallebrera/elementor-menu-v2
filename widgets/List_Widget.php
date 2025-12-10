@@ -50,6 +50,19 @@ class List_Widget extends Widget_Base {
         );
 
         $this->add_control(
+            'content_source',
+            [
+                'label' => __('Content Source', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'repeater' => __('Repeater Items', 'soda-elementor-addons'),
+                    'text' => __('Pasted List', 'soda-elementor-addons'),
+                ],
+                'default' => 'repeater',
+            ]
+        );
+
+        $this->add_control(
             'list_layout',
             [
                 'label' => __('Layout', 'soda-elementor-addons'),
@@ -59,6 +72,19 @@ class List_Widget extends Widget_Base {
                     'horizontal' => __('Horizontal', 'soda-elementor-addons'),
                 ],
                 'default' => 'vertical',
+            ]
+        );
+
+        $this->add_control(
+            'list_type',
+            [
+                'label' => __('List Type', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'ul' => __('Unordered', 'soda-elementor-addons'),
+                    'ol' => __('Ordered', 'soda-elementor-addons'),
+                ],
+                'default' => 'ul',
             ]
         );
 
@@ -79,6 +105,20 @@ class List_Widget extends Widget_Base {
                 ],
                 'default' => 'left',
                 'toggle' => false,
+            ]
+        );
+
+        $this->add_control(
+            'list_text_input',
+            [
+                'label' => __('Pasted List Items', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXTAREA,
+                'rows' => 8,
+                'placeholder' => "<li>Item one</li>\n<li>Item two</li>",
+                'description' => __('Paste list items (with or without <li> tags). Each item will be converted into the styled list.', 'soda-elementor-addons'),
+                'condition' => [
+                    'content_source' => 'text',
+                ],
             ]
         );
 
@@ -151,6 +191,9 @@ class List_Widget extends Widget_Base {
                     ],
                 ],
                 'title_field' => '{{{ item_text }}}',
+                'condition' => [
+                    'content_source' => 'repeater',
+                ],
             ]
         );
 
@@ -488,7 +531,13 @@ class List_Widget extends Widget_Base {
 
     protected function render() {
         $settings = $this->get_settings_for_display();
-        $items = !empty($settings['list_items']) && is_array($settings['list_items']) ? $settings['list_items'] : [];
+        $content_source = !empty($settings['content_source']) ? $settings['content_source'] : 'repeater';
+
+        if ($content_source === 'text') {
+            $items = $this->parse_list_text(!empty($settings['list_text_input']) ? $settings['list_text_input'] : '');
+        } else {
+            $items = !empty($settings['list_items']) && is_array($settings['list_items']) ? $settings['list_items'] : [];
+        }
 
         if (empty($items)) {
             echo '<div class="soda-alist soda-alist--vertical">' . esc_html__('Add items to the list.', 'soda-elementor-addons') . '</div>';
@@ -497,6 +546,7 @@ class List_Widget extends Widget_Base {
 
         $layout = !empty($settings['list_layout']) && $settings['list_layout'] === 'horizontal' ? 'horizontal' : 'vertical';
         $icon_position = !empty($settings['icon_position']) && $settings['icon_position'] === 'right' ? 'right' : 'left';
+        $list_tag = !empty($settings['list_type']) && $settings['list_type'] === 'ol' ? 'ol' : 'ul';
 
         if (!empty($settings['alignment'])) {
             $alignment_class = 'soda-alist--align-' . $settings['alignment'];
@@ -511,21 +561,34 @@ class List_Widget extends Widget_Base {
             $alignment_class,
         ];
 
-        echo '<ul class="' . esc_attr(implode(' ', $wrapper_classes)) . '">';
+        $global_icon = !empty($settings['global_icon']['value']) ? $settings['global_icon'] : null;
+
+        echo '<' . $list_tag . ' class="' . esc_attr(implode(' ', $wrapper_classes)) . '">';
 
         foreach ($items as $index => $item) {
-            $icon = !empty($item['item_icon']['value']) ? $item['item_icon'] : $settings['global_icon'];
-            $has_icon = !empty($icon['value']);
+            if ($content_source === 'text') {
+                $item_title = wp_kses_post($item);
+                $item_description = '';
+                $icon = $global_icon;
+                $has_icon = !empty($icon) && !empty($icon['value']);
+                $tag = 'div';
+                $link_key = 'list-item-' . $this->get_id() . '-' . $index;
+                $this->add_render_attribute($link_key, 'class', 'soda-alist__item-link');
+            } else {
+                $icon = !empty($item['item_icon']['value']) ? $item['item_icon'] : $global_icon;
+                $has_icon = !empty($icon) && !empty($icon['value']);
+                $link_key = 'list-item-' . $this->get_id() . '-' . $index;
+                $tag = 'div';
 
-            $link_key = 'list-item-' . $this->get_id() . '-' . $index;
-            $tag = 'div';
+                if (!empty($item['item_link']['url'])) {
+                    $tag = 'a';
+                    $this->add_link_attributes($link_key, $item['item_link']);
+                }
 
-            if (!empty($item['item_link']['url'])) {
-                $tag = 'a';
-                $this->add_link_attributes($link_key, $item['item_link']);
+                $this->add_render_attribute($link_key, 'class', 'soda-alist__item-link');
+                $item_title = !empty($item['item_text']) ? esc_html($item['item_text']) : '';
+                $item_description = !empty($item['item_description']) ? esc_html($item['item_description']) : '';
             }
-
-            $this->add_render_attribute($link_key, 'class', 'soda-alist__item-link');
 
             echo '<li class="soda-alist__item">';
             echo '<' . $tag . ' ' . $this->get_render_attribute_string($link_key) . '>';
@@ -538,12 +601,12 @@ class List_Widget extends Widget_Base {
 
             echo '<span class="soda-alist__text">';
 
-            if (!empty($item['item_text'])) {
-                echo '<span class="soda-alist__title">' . esc_html($item['item_text']) . '</span>';
+            if (!empty($item_title)) {
+                echo '<span class="soda-alist__title">' . $item_title . '</span>';
             }
 
-            if (!empty($item['item_description'])) {
-                echo '<span class="soda-alist__description">' . esc_html($item['item_description']) . '</span>';
+            if (!empty($item_description)) {
+                echo '<span class="soda-alist__description">' . $item_description . '</span>';
             }
 
             echo '</span>';
@@ -551,6 +614,45 @@ class List_Widget extends Widget_Base {
             echo '</li>';
         }
 
-        echo '</ul>';
+        echo '</' . $list_tag . '>';
+    }
+
+    /**
+     * Parse pasted list text into individual items.
+     */
+    private function parse_list_text($text) {
+        $items = [];
+
+        if (empty($text)) {
+            return $items;
+        }
+
+        if (preg_match_all('/<li\b[^>]*>(.*?)<\/li>/is', $text, $matches)) {
+            foreach ($matches[1] as $content) {
+                $content = trim($content);
+                if ($content !== '') {
+                    $items[] = $content;
+                }
+            }
+        } else {
+            $lines = preg_split('/\r\n|\r|\n/', $text);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line === '') {
+                    continue;
+                }
+
+                $line = preg_replace('/^\s*[-*+•]\s*/u', '', $line);
+                $line = preg_replace('/^\s*\d+\.\s+/', '', $line);
+                $line = preg_replace('/^\s*\d+\)\s+/', '', $line);
+                $line = trim($line);
+
+                if ($line !== '') {
+                    $items[] = sanitize_text_field($line);
+                }
+            }
+        }
+
+        return $items;
     }
 }
