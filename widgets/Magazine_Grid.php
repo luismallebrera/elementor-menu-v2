@@ -368,9 +368,6 @@ class Magazine_Grid extends Widget_Base {
                 'default' => 6,
                 'min' => 1,
                 'max' => 100,
-                'condition' => [
-                    'post_type!' => 'manual',
-                ],
             ]
         );
 
@@ -1514,13 +1511,16 @@ class Magazine_Grid extends Widget_Base {
                 return;
             }
 
+            $requested_posts = !empty($settings['posts_per_page']) ? max(1, (int) $settings['posts_per_page']) : count($manual_ids);
+            $manual_limit = min($requested_posts, count($manual_ids));
+
             $manual_order_by = !empty($settings['order_by']) ? $settings['order_by'] : 'date';
             $manual_order = !empty($settings['order']) ? $settings['order'] : 'DESC';
 
             $args = [
                 'post_type' => 'any',
                 'post__in' => $manual_ids,
-                'posts_per_page' => count($manual_ids),
+                'posts_per_page' => $manual_limit,
                 'post_status' => 'publish',
                 'orderby' => $manual_order_by,
                 'order' => $manual_order,
@@ -1539,7 +1539,7 @@ class Magazine_Grid extends Widget_Base {
                 ];
             }
 
-            $max_items = count($manual_ids);
+            $max_items = $manual_limit;
         } else {
             // Query args
             // Request more posts than needed to account for filtering
