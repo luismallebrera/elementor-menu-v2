@@ -346,6 +346,21 @@ class Magazine_Grid extends Widget_Base {
         );
 
         $this->add_control(
+            'manual_post_ids',
+            [
+                'label' => __('Manual Selection', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT2,
+                'multiple' => true,
+                'label_block' => true,
+                'options' => $this->get_manual_posts_options(),
+                'condition' => [
+                    'post_type' => 'manual',
+                ],
+                'description' => __('Choose specific posts to display. The selection order is preserved on the front end.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $this->add_control(
             'posts_per_page',
             [
                 'label' => __('Posts Per Page', 'soda-elementor-addons'),
@@ -353,6 +368,9 @@ class Magazine_Grid extends Widget_Base {
                 'default' => 6,
                 'min' => 1,
                 'max' => 100,
+                'condition' => [
+                    'post_type!' => 'manual',
+                ],
             ]
         );
 
@@ -369,6 +387,9 @@ class Magazine_Grid extends Widget_Base {
                     'menu_order' => __('Menu Order', 'soda-elementor-addons'),
                 ],
                 'default' => 'date',
+                'condition' => [
+                    'post_type!' => 'manual',
+                ],
             ]
         );
 
@@ -382,6 +403,39 @@ class Magazine_Grid extends Widget_Base {
                     'DESC' => __('Descending', 'soda-elementor-addons'),
                 ],
                 'default' => 'DESC',
+                'condition' => [
+                    'post_type!' => 'manual',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'include_terms',
+            [
+                'label' => __('Include Terms', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT2,
+                'multiple' => true,
+                'label_block' => true,
+                'options' => $this->get_terms_options(),
+                'condition' => [
+                    'post_type!' => 'manual',
+                ],
+                'description' => __('Posts must match at least one of the selected terms.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $this->add_control(
+            'exclude_terms',
+            [
+                'label' => __('Exclude Terms', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT2,
+                'multiple' => true,
+                'label_block' => true,
+                'options' => $this->get_terms_options(),
+                'condition' => [
+                    'post_type!' => 'manual',
+                ],
+                'description' => __('Exclude posts assigned to any of the selected terms.', 'soda-elementor-addons'),
             ]
         );
 
@@ -1197,8 +1251,122 @@ class Magazine_Grid extends Widget_Base {
         foreach ($post_types as $post_type) {
             $options[$post_type->name] = $post_type->label;
         }
+
+        $options['manual'] = __('Manual Selection', 'soda-elementor-addons');
         
         return $options;
+    }
+
+    /**
+     * Get options for manual post selection control.
+     */
+    private function get_manual_posts_options() {
+        $options = [];
+        $post_types = get_post_types(['public' => true], 'objects');
+        $limit = apply_filters('soda_magazine_grid_manual_selection_limit', 200);
+
+        foreach ($post_types as $post_type => $object) {
+            $posts = get_posts([
+                'post_type' => $post_type,
+                'posts_per_page' => $limit,
+                'post_status' => 'publish',
+                'orderby' => 'title',
+                'order' => 'ASC',
+                'suppress_filters' => false,
+            ]);
+
+            if (empty($posts)) {
+                continue;
+            }
+
+            foreach ($posts as $post) {
+                $title = trim($post->post_title);
+                if ($title === '') {
+                    $title = sprintf(__('(ID %d) Untitled', 'soda-elementor-addons'), $post->ID);
+                }
+
+                $options[$post->ID] = sprintf('%s (%s)', $title, $object->labels->singular_name);
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * Get available taxonomy terms for include/exclude controls.
+     */
+    private function get_terms_options() {
+        $options = [];
+        $taxonomies = get_taxonomies(['public' => true], 'objects');
+        $limit = apply_filters('soda_magazine_grid_term_selection_limit', 200);
+
+        foreach ($taxonomies as $taxonomy => $object) {
+            $terms = get_terms([
+                'taxonomy' => $taxonomy,
+                'hide_empty' => false,
+                'number' => $limit,
+            ]);
+
+            if (is_wp_error($terms) || empty($terms)) {
+                continue;
+            }
+
+            foreach ($terms as $term) {
+                $label = sprintf('%s (%s)', $term->name, $object->labels->singular_name);
+                $options[$term->term_id] = $label;
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * Group selected term IDs by taxonomy.
+     */
+    private function group_terms_by_taxonomy($term_ids) {
+        $grouped = [];
+
+        if (empty($term_ids) || !is_array($term_ids)) {
+            return $grouped;
+        }
+
+        foreach ($term_ids as $term_id) {
+            $term = get_term($term_id);
+
+            if ($term instanceof \WP_Term) {
+                $grouped[$term->taxonomy][] = (int) $term->term_id;
+            }
+        }
+
+        return $grouped;
+    }
+
+    /**
+     * Normalize manual selection IDs preserving the order selected in the control.
+     */
+    private function get_manual_post_ids($settings) {
+        $manual_ids = [];
+
+        if (!empty($settings['manual_post_ids']) && is_array($settings['manual_post_ids'])) {
+            foreach ($settings['manual_post_ids'] as $id) {
+                $id = absint($id);
+                if ($id && !in_array($id, $manual_ids, true)) {
+                    $manual_ids[] = $id;
+                }
+            }
+        }
+
+        if ($settings['exclude_current'] === 'yes' && is_singular()) {
+            $current_id = get_the_ID();
+            $manual_ids = array_values(array_filter(
+                $manual_ids,
+                static function ($id) use ($current_id) {
+                    return $id !== $current_id;
+                }
+            ));
+        }
+
+        return $manual_ids;
     }
 
     /**
@@ -1341,39 +1509,103 @@ class Magazine_Grid extends Widget_Base {
      * Render posts from query
      */
     private function render_posts($settings) {
-        
-        // Query args
-        // Request more posts than needed to account for filtering
-        $requested_posts = $settings['posts_per_page'];
-        $query_posts = ($settings['hide_empty_title'] === 'yes' || $settings['only_featured_image'] === 'yes') 
-            ? $requested_posts * 3 
-            : $requested_posts;
-        
-        $args = [
-            'post_type' => $settings['post_type'],
-            'posts_per_page' => $query_posts,
-            'orderby' => $settings['order_by'],
-            'order' => $settings['order'],
-            'post_status' => 'publish',
-        ];
-        
-        // Exclude current post
-        if ($settings['exclude_current'] === 'yes' && is_singular()) {
-            $args['post__not_in'] = [get_the_ID()];
-        }
-        
-        // Only posts with featured image (pre-filter in query)
-        if ($settings['only_featured_image'] === 'yes') {
-            $args['meta_query'] = [
-                [
-                    'key' => '_thumbnail_id',
-                    'compare' => 'EXISTS',
-                ],
+        $is_manual = isset($settings['post_type']) && $settings['post_type'] === 'manual';
+        $manual_ids = [];
+
+        if ($is_manual) {
+            $manual_ids = $this->get_manual_post_ids($settings);
+
+            if (empty($manual_ids)) {
+                echo '<p>' . __('Select at least one post to display.', 'soda-elementor-addons') . '</p>';
+                return;
+            }
+
+            $args = [
+                'post_type' => 'any',
+                'post__in' => $manual_ids,
+                'posts_per_page' => count($manual_ids),
+                'orderby' => 'post__in',
+                'order' => 'ASC',
+                'post_status' => 'publish',
             ];
+
+            if ($settings['only_featured_image'] === 'yes') {
+                $args['meta_query'] = [
+                    [
+                        'key' => '_thumbnail_id',
+                        'compare' => 'EXISTS',
+                    ],
+                ];
+            }
+
+            $max_items = count($manual_ids);
+        } else {
+            // Query args
+            // Request more posts than needed to account for filtering
+            $requested_posts = max(1, (int) $settings['posts_per_page']);
+            $query_posts = ($settings['hide_empty_title'] === 'yes' || $settings['only_featured_image'] === 'yes')
+                ? $requested_posts * 3
+                : $requested_posts;
+
+            $args = [
+                'post_type' => $settings['post_type'],
+                'posts_per_page' => $query_posts,
+                'orderby' => $settings['order_by'],
+                'order' => $settings['order'],
+                'post_status' => 'publish',
+            ];
+
+            // Exclude current post
+            if ($settings['exclude_current'] === 'yes' && is_singular()) {
+                $args['post__not_in'] = [get_the_ID()];
+            }
+
+            // Only posts with featured image (pre-filter in query)
+            if ($settings['only_featured_image'] === 'yes') {
+                $args['meta_query'] = [
+                    [
+                        'key' => '_thumbnail_id',
+                        'compare' => 'EXISTS',
+                    ],
+                ];
+            }
+
+            $include_terms = $this->group_terms_by_taxonomy(!empty($settings['include_terms']) ? $settings['include_terms'] : []);
+            $exclude_terms = $this->group_terms_by_taxonomy(!empty($settings['exclude_terms']) ? $settings['exclude_terms'] : []);
+
+            if (!empty($include_terms) || !empty($exclude_terms)) {
+                $tax_query = [];
+
+                foreach ($include_terms as $taxonomy => $term_ids) {
+                    $tax_query[] = [
+                        'taxonomy' => $taxonomy,
+                        'field' => 'term_id',
+                        'terms' => array_map('absint', $term_ids),
+                        'operator' => 'IN',
+                    ];
+                }
+
+                foreach ($exclude_terms as $taxonomy => $term_ids) {
+                    $tax_query[] = [
+                        'taxonomy' => $taxonomy,
+                        'field' => 'term_id',
+                        'terms' => array_map('absint', $term_ids),
+                        'operator' => 'NOT IN',
+                    ];
+                }
+
+                if (count($tax_query) > 1) {
+                    $tax_query['relation'] = 'AND';
+                }
+
+                $args['tax_query'] = $tax_query;
+            }
+
+            $max_items = $requested_posts;
         }
-        
+
         $query = new \WP_Query($args);
-        
+
         if (!$query->have_posts()) {
             echo '<p>' . __('No posts found.', 'soda-elementor-addons') . '</p>';
             return;
@@ -1395,7 +1627,7 @@ class Magazine_Grid extends Widget_Base {
             <?php
             $counter = 0;
             $displayed_items = 0;
-            $max_items = $settings['posts_per_page'];
+        
             
             while ($query->have_posts() && $displayed_items < $max_items) {
                 $query->the_post();
