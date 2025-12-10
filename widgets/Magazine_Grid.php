@@ -1270,8 +1270,8 @@ class Magazine_Grid extends Widget_Base {
                 'post_type' => $post_type,
                 'posts_per_page' => $limit,
                 'post_status' => 'publish',
-                'orderby' => 'title',
-                'order' => 'ASC',
+                'orderby' => 'date',
+                'order' => 'DESC',
                 'suppress_filters' => false,
             ]);
 
