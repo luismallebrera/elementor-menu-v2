@@ -599,24 +599,36 @@ class Breadcrumbs extends Widget_Base {
     private function shorten_text($text, $max_length, $suffix = '...') {
         $text = trim(wp_strip_all_tags($text));
 
+        if ($text === '') {
+            return $text;
+        }
+
+        $charset = get_bloginfo('charset') ?: 'UTF-8';
+        $text = html_entity_decode($text, ENT_QUOTES, $charset);
+
         if ($max_length <= 0 || mb_strlen($text, 'UTF-8') <= $max_length) {
             return $text;
         }
 
-        $trimmed = mb_substr($text, 0, $max_length, 'UTF-8');
+        $excerpt = wp_html_excerpt($text, $max_length, '');
+        $excerpt = trim(preg_replace('/\s+/u', ' ', $excerpt));
 
-        $last_space = mb_strrpos($trimmed, ' ', 0, 'UTF-8');
-        if ($last_space !== false) {
-            $trimmed = mb_substr($trimmed, 0, $last_space, 'UTF-8');
+        if ($excerpt === '') {
+            return mb_substr($text, 0, $max_length, 'UTF-8') . $suffix;
         }
 
-        $trimmed = rtrim($trimmed, " \t\n\r\0\x0B.,;:-_/");
+        if (mb_strlen($excerpt, 'UTF-8') < mb_strlen($text, 'UTF-8')) {
+            if (!preg_match('/\s$/u', $excerpt)) {
+                $last_space = mb_strrpos($excerpt, ' ', 0, 'UTF-8');
+                if ($last_space !== false) {
+                    $excerpt = mb_substr($excerpt, 0, $last_space, 'UTF-8');
+                }
+            }
 
-        if ($trimmed === '') {
-            $trimmed = rtrim(mb_substr($text, 0, $max_length, 'UTF-8'));
+            $excerpt = rtrim($excerpt, " \t\n\r\0\x0B.,;:-_/");
         }
 
-        return $trimmed . $suffix;
+        return $excerpt . $suffix;
     }
 
     /**
