@@ -138,15 +138,47 @@ class Breadcrumbs extends Widget_Base {
         );
 
         $this->add_control(
+            'shorten_method',
+            [
+                'label' => __('Shorten By', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'characters' => __('Characters', 'soda-elementor-addons'),
+                    'words' => __('Words', 'soda-elementor-addons'),
+                ],
+                'default' => 'characters',
+                'condition' => [
+                    'shorten_title' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
             'max_title_length',
             [
-                'label' => __('Max Title Length', 'soda-elementor-addons'),
+                'label' => __('Max Characters', 'soda-elementor-addons'),
                 'type' => Controls_Manager::NUMBER,
                 'default' => 50,
                 'min' => 10,
                 'max' => 200,
                 'condition' => [
                     'shorten_title' => 'yes',
+                    'shorten_method' => 'characters',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'max_title_words',
+            [
+                'label' => __('Max Words', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 10,
+                'min' => 1,
+                'max' => 100,
+                'condition' => [
+                    'shorten_title' => 'yes',
+                    'shorten_method' => 'words',
                 ],
             ]
         );
@@ -596,7 +628,16 @@ class Breadcrumbs extends Widget_Base {
     /**
      * Shorten text
      */
-    private function shorten_text($text, $max_length, $suffix = '...') {
+    private function shorten_text($text, array $args = []) {
+        $defaults = [
+            'method' => 'characters',
+            'max_characters' => 50,
+            'max_words' => 10,
+            'suffix' => '...'
+        ];
+
+        $options = array_merge($defaults, $args);
+
         $text = trim(wp_strip_all_tags($text));
 
         if ($text === '') {
@@ -606,7 +647,14 @@ class Breadcrumbs extends Widget_Base {
         $charset = get_bloginfo('charset') ?: 'UTF-8';
         $text = html_entity_decode($text, ENT_QUOTES, $charset);
 
-        if ($max_length <= 0 || mb_strlen($text, 'UTF-8') <= $max_length) {
+        if ($options['method'] === 'words') {
+            $word_limit = max(1, (int) $options['max_words']);
+            return wp_trim_words($text, $word_limit, $options['suffix']);
+        }
+
+        $max_length = max(0, (int) $options['max_characters']);
+
+        if ($max_length === 0 || mb_strlen($text, 'UTF-8') <= $max_length) {
             return $text;
         }
 
@@ -614,7 +662,7 @@ class Breadcrumbs extends Widget_Base {
         $excerpt = trim(preg_replace('/\s+/u', ' ', $excerpt));
 
         if ($excerpt === '') {
-            return mb_substr($text, 0, $max_length, 'UTF-8') . $suffix;
+            return mb_substr($text, 0, $max_length, 'UTF-8') . $options['suffix'];
         }
 
         if (mb_strlen($excerpt, 'UTF-8') < mb_strlen($text, 'UTF-8')) {
@@ -626,9 +674,15 @@ class Breadcrumbs extends Widget_Base {
             }
 
             $excerpt = rtrim($excerpt, " \t\n\r\0\x0B.,;:-_/");
+
+            if ($excerpt === '') {
+                $excerpt = mb_substr($text, 0, $max_length, 'UTF-8');
+            }
+
+            return $excerpt . $options['suffix'];
         }
 
-        return $excerpt . $suffix;
+        return $excerpt;
     }
 
     /**
@@ -665,9 +719,13 @@ class Breadcrumbs extends Widget_Base {
                 $title = $item['title'];
                 if ($is_current && $settings['shorten_title'] === 'yes') {
                     $title = $this->shorten_text(
-                        $title, 
-                        $settings['max_title_length'], 
-                        $settings['title_suffix']
+                        $title,
+                        [
+                            'method' => $settings['shorten_method'] ?? 'characters',
+                            'max_characters' => isset($settings['max_title_length']) ? (int) $settings['max_title_length'] : 50,
+                            'max_words' => isset($settings['max_title_words']) ? (int) $settings['max_title_words'] : 10,
+                            'suffix' => $settings['title_suffix'] ?? '...'
+                        ]
                     );
                 }
                 ?>
