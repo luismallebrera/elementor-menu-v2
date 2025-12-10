@@ -81,3 +81,26 @@
     margin: 0;
     font-size: 0.875em;
 }
+
+.soda-alist__rich-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.soda-alist__rich-text > * {
+    margin: 0;
+}
+
+.soda-alist__sublist {
+    margin: 0.5em 0 0;
+    padding-left: 1.5em;
+}
+
+.soda-alist__sublist li {
+    margin: 0.25em 0;
+}
+
+.soda-alist__item--has-sublist .soda-alist__rich-text > .soda-alist__sublist {
+    margin-top: 0.75em;
+}

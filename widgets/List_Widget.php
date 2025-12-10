@@ -402,6 +402,100 @@ class List_Widget extends Widget_Base {
             ]
         );
 
+        $this->add_control(
+            'sublist_heading',
+            [
+                'label' => __('Sublist', 'soda-elementor-addons'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'sublist_typography',
+                'selector' => '{{WRAPPER}} .soda-alist__sublist li',
+            ]
+        );
+
+        $this->add_control(
+            'sublist_color',
+            [
+                'label' => __('Sublist Color', 'soda-elementor-addons'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .soda-alist__sublist li' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'sublist_bullet_style',
+            [
+                'label' => __('Sublist Bullet Style', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'default' => __('Default', 'soda-elementor-addons'),
+                    'disc' => __('Disc', 'soda-elementor-addons'),
+                    'circle' => __('Circle', 'soda-elementor-addons'),
+                    'square' => __('Square', 'soda-elementor-addons'),
+                    'decimal' => __('Decimal', 'soda-elementor-addons'),
+                    'lower-alpha' => __('Lower Alpha', 'soda-elementor-addons'),
+                    'none' => __('None', 'soda-elementor-addons'),
+                ],
+                'default' => 'default',
+                'selectors_dictionary' => [
+                    'default' => '',
+                    'disc' => 'list-style-type: disc;',
+                    'circle' => 'list-style-type: circle;',
+                    'square' => 'list-style-type: square;',
+                    'decimal' => 'list-style-type: decimal;',
+                    'lower-alpha' => 'list-style-type: lower-alpha;',
+                    'none' => 'list-style-type: none;',
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .soda-alist__sublist' => '{{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'sublist_indent',
+            [
+                'label' => __('Sublist Indent', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', 'rem'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 80,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .soda-alist__sublist' => 'padding-left: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'sublist_item_spacing',
+            [
+                'label' => __('Sublist Item Spacing', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', 'rem'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 40,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .soda-alist__sublist > li:not(:last-child)' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
 
         $this->start_controls_section(
@@ -566,19 +660,22 @@ class List_Widget extends Widget_Base {
         echo '<' . $list_tag . ' class="' . esc_attr(implode(' ', $wrapper_classes)) . '">';
 
         foreach ($items as $index => $item) {
+            $link_key = 'list-item-' . $this->get_id() . '-' . $index;
+            $tag = 'div';
+            $item_title = '';
+            $item_description = '';
+            $item_html = '';
+            $has_sublist = false;
+
             if ($content_source === 'text') {
-                $item_title = wp_kses_post($item);
-                $item_description = '';
                 $icon = $global_icon;
                 $has_icon = !empty($icon) && !empty($icon['value']);
-                $tag = 'div';
-                $link_key = 'list-item-' . $this->get_id() . '-' . $index;
+                $item_html = isset($item['html']) ? $item['html'] : '';
+                $has_sublist = !empty($item['has_sublist']);
                 $this->add_render_attribute($link_key, 'class', 'soda-alist__item-link');
             } else {
                 $icon = !empty($item['item_icon']['value']) ? $item['item_icon'] : $global_icon;
                 $has_icon = !empty($icon) && !empty($icon['value']);
-                $link_key = 'list-item-' . $this->get_id() . '-' . $index;
-                $tag = 'div';
 
                 if (!empty($item['item_link']['url'])) {
                     $tag = 'a';
@@ -590,7 +687,13 @@ class List_Widget extends Widget_Base {
                 $item_description = !empty($item['item_description']) ? esc_html($item['item_description']) : '';
             }
 
-            echo '<li class="soda-alist__item">';
+            $item_classes = ['soda-alist__item'];
+
+            if ($has_sublist) {
+                $item_classes[] = 'soda-alist__item--has-sublist';
+            }
+
+            echo '<li class="' . esc_attr(implode(' ', $item_classes)) . '">';
             echo '<' . $tag . ' ' . $this->get_render_attribute_string($link_key) . '>';
 
             if ($has_icon) {
@@ -599,17 +702,23 @@ class List_Widget extends Widget_Base {
                 echo '</span>';
             }
 
-            echo '<span class="soda-alist__text">';
+            echo '<div class="soda-alist__text">';
 
-            if (!empty($item_title)) {
-                echo '<span class="soda-alist__title">' . $item_title . '</span>';
+            if ($content_source === 'text') {
+                if ($item_html !== '') {
+                    echo '<div class="soda-alist__rich-text">' . $item_html . '</div>';
+                }
+            } else {
+                if (!empty($item_title)) {
+                    echo '<span class="soda-alist__title">' . $item_title . '</span>';
+                }
+
+                if (!empty($item_description)) {
+                    echo '<span class="soda-alist__description">' . $item_description . '</span>';
+                }
             }
 
-            if (!empty($item_description)) {
-                echo '<span class="soda-alist__description">' . $item_description . '</span>';
-            }
-
-            echo '</span>';
+            echo '</div>';
             echo '</' . $tag . '>';
             echo '</li>';
         }
@@ -627,32 +736,185 @@ class List_Widget extends Widget_Base {
             return $items;
         }
 
-        if (preg_match_all('/<li\b[^>]*>(.*?)<\/li>/is', $text, $matches)) {
-            foreach ($matches[1] as $content) {
-                $content = trim($content);
-                if ($content !== '') {
-                    $items[] = $content;
-                }
+        if (preg_match('/<li\b/i', $text)) {
+            $items = $this->parse_list_items_from_html($text);
+
+            if (!empty($items)) {
+                return $items;
             }
-        } else {
-            $lines = preg_split('/\r\n|\r|\n/', $text);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if ($line === '') {
-                    continue;
-                }
+        }
 
-                $line = preg_replace('/^\s*[-*+•]\s*/u', '', $line);
-                $line = preg_replace('/^\s*\d+\.\s+/', '', $line);
-                $line = preg_replace('/^\s*\d+\)\s+/', '', $line);
-                $line = trim($line);
+        $lines = preg_split('/\r\n|\r|\n/', $text);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
 
-                if ($line !== '') {
-                    $items[] = sanitize_text_field($line);
-                }
+            $line = preg_replace('/^\s*[-*+•]\s*/u', '', $line);
+            $line = preg_replace('/^\s*\d+\.\s+/', '', $line);
+            $line = preg_replace('/^\s*\d+\)\s+/', '', $line);
+            $line = trim($line);
+
+            if ($line !== '') {
+                $items[] = [
+                    'html' => esc_html($line),
+                    'has_sublist' => false,
+                ];
             }
         }
 
         return $items;
+    }
+
+    /**
+     * Sanitize list item HTML while keeping nested list structure.
+     */
+    private function sanitize_list_item_html($html) {
+        $html = trim($html);
+
+        if ($html === '') {
+            return '';
+        }
+
+        $allowed_tags = [
+            'a' => [
+                'href' => true,
+                'title' => true,
+                'target' => true,
+                'rel' => true,
+            ],
+            'b' => [],
+            'br' => [],
+            'em' => [],
+            'i' => [],
+            'u' => [],
+            'mark' => [],
+            'strong' => [],
+            'span' => [
+                'class' => true,
+            ],
+            'ul' => [
+                'class' => true,
+            ],
+            'ol' => [
+                'class' => true,
+                'type' => true,
+                'start' => true,
+            ],
+            'li' => [
+                'class' => true,
+            ],
+            'p' => [
+                'class' => true,
+            ],
+        ];
+
+        $sanitized = wp_kses($html, $allowed_tags);
+
+        if ($sanitized === '') {
+            return '';
+        }
+
+        return trim($this->add_sublist_class($sanitized));
+    }
+
+    /**
+     * Parse HTML containing <li> tags into sanitized items preserving nesting.
+     */
+    private function parse_list_items_from_html($html) {
+        $items = [];
+        $html = trim($html);
+
+        if ($html === '') {
+            return $items;
+        }
+
+        $previous_state = libxml_use_internal_errors(true);
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+
+        $wrapped_html = '<div>' . $html . '</div>';
+        $flags = 0;
+
+        if (defined('LIBXML_HTML_NOIMPLIED')) {
+            $flags |= LIBXML_HTML_NOIMPLIED;
+        }
+
+        if (defined('LIBXML_HTML_NODEFDTD')) {
+            $flags |= LIBXML_HTML_NODEFDTD;
+        }
+
+        $loaded = $dom->loadHTML('<?xml encoding="utf-8" ?>' . $wrapped_html, $flags);
+
+        if (!$loaded) {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous_state);
+            return $items;
+        }
+
+        $xpath = new \DOMXPath($dom);
+        $list_nodes = $xpath->query('//li[not(ancestor::li)]');
+
+        foreach ($list_nodes as $node) {
+            $inner_html = '';
+
+            foreach ($node->childNodes as $child) {
+                $inner_html .= $dom->saveHTML($child);
+            }
+
+            $sanitized = $this->sanitize_list_item_html($inner_html);
+
+            if ($sanitized !== '') {
+                $items[] = [
+                    'html' => $sanitized,
+                    'has_sublist' => $this->contains_sublist($sanitized),
+                ];
+            }
+        }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous_state);
+
+        return $items;
+    }
+
+    /**
+     * Add a consistent class to nested lists for styling.
+     */
+    private function add_sublist_class($html) {
+        return preg_replace_callback('/<(ul|ol)([^>]*)>/i', function ($matches) {
+            $tag = $matches[1];
+            $attributes = $matches[2];
+
+            if (stripos($attributes, 'soda-alist__sublist') !== false) {
+                return '<' . $tag . $attributes . '>';
+            }
+
+            if (trim($attributes) === '') {
+                $attributes = ' class="soda-alist__sublist"';
+            } elseif (stripos($attributes, 'class=') !== false) {
+                $attributes = preg_replace_callback("/class=(['\"])(.*?)\\1/i", function ($class_match) {
+                    $quote = $class_match[1];
+                    $classes = $class_match[2];
+
+                    if (strpos($classes, 'soda-alist__sublist') !== false) {
+                        return 'class=' . $quote . $classes . $quote;
+                    }
+
+                    return 'class=' . $quote . trim($classes . ' soda-alist__sublist') . $quote;
+                }, $attributes, 1);
+            } else {
+                $attributes .= ' class="soda-alist__sublist"';
+            }
+
+            return '<' . $tag . $attributes . '>';
+        }, $html);
+    }
+
+    /**
+     * Determine whether the list item contains a nested sublist.
+     */
+    private function contains_sublist($html) {
+        return (stripos($html, '<ul') !== false || stripos($html, '<ol') !== false);
     }
 }
