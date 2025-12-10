@@ -290,6 +290,13 @@ final class Elementor_Menu_Widget_V2 {
             [],
             self::VERSION
         );
+
+        wp_register_style(
+            'soda-list-widget',
+            plugins_url('assets/css/list-widget.css', __FILE__),
+            [],
+            self::VERSION
+        );
     }
 
     public function widget_scripts() {
