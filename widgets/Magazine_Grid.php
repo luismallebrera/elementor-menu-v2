@@ -387,9 +387,6 @@ class Magazine_Grid extends Widget_Base {
                     'menu_order' => __('Menu Order', 'soda-elementor-addons'),
                 ],
                 'default' => 'date',
-                'condition' => [
-                    'post_type!' => 'manual',
-                ],
             ]
         );
 
@@ -403,9 +400,6 @@ class Magazine_Grid extends Widget_Base {
                     'DESC' => __('Descending', 'soda-elementor-addons'),
                 ],
                 'default' => 'DESC',
-                'condition' => [
-                    'post_type!' => 'manual',
-                ],
             ]
         );
 
@@ -1520,14 +1514,21 @@ class Magazine_Grid extends Widget_Base {
                 return;
             }
 
+            $manual_order_by = !empty($settings['order_by']) ? $settings['order_by'] : 'date';
+            $manual_order = !empty($settings['order']) ? $settings['order'] : 'DESC';
+
             $args = [
                 'post_type' => 'any',
                 'post__in' => $manual_ids,
                 'posts_per_page' => count($manual_ids),
-                'orderby' => 'post__in',
-                'order' => 'ASC',
                 'post_status' => 'publish',
+                'orderby' => $manual_order_by,
+                'order' => $manual_order,
             ];
+
+            if ($manual_order_by === 'rand') {
+                unset($args['order']);
+            }
 
             if ($settings['only_featured_image'] === 'yes') {
                 $args['meta_query'] = [
