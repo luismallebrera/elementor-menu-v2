@@ -34,12 +34,22 @@ class Soda_Parallax_Background {
             '2.0',
             true
         );
-        
+
         wp_enqueue_script(
             'jarallax-element',
             'https://cdn.jsdelivr.net/npm/jarallax@2/dist/jarallax-element.min.js',
             ['jarallax'],
             '2.0',
+            true
+        );
+
+        $script_url = plugins_url('assets/js/parallax-background.js', dirname(__DIR__) . '/soda-elementor-addons.php');
+
+        wp_enqueue_script(
+            'soda-parallax-background',
+            $script_url,
+            ['elementor-frontend', 'jarallax-element'],
+            class_exists('Elementor_Menu_Widget_V2') ? Elementor_Menu_Widget_V2::VERSION : '1.0.0',
             true
         );
     }
