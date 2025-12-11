@@ -191,6 +191,50 @@ class Magazine_Grid extends Widget_Base {
         );
 
         $custom_repeater->add_control(
+            'column_span_laptop',
+            [
+                'label' => __('Column Span (Laptop)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'column_span_tablet',
+            [
+                'label' => __('Column Span (Tablet)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'column_span_mobile_extra',
+            [
+                'label' => __('Column Span (Mobile Extra)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the tablet span (or desktop if tablet is empty).', 'soda-elementor-addons'),
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'column_span_mobile',
+            [
+                'label' => __('Column Span (Mobile)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the mobile extra span (or tablet if both are empty).', 'soda-elementor-addons'),
+            ]
+        );
+
+        $custom_repeater->add_control(
             'row_span',
             [
                 'label' => __('Row Span', 'soda-elementor-addons'),
@@ -198,6 +242,50 @@ class Magazine_Grid extends Widget_Base {
                 'default' => 1,
                 'min' => 1,
                 'max' => 10,
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'row_span_laptop',
+            [
+                'label' => __('Row Span (Laptop)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'row_span_tablet',
+            [
+                'label' => __('Row Span (Tablet)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'row_span_mobile_extra',
+            [
+                'label' => __('Row Span (Mobile Extra)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the tablet span (or desktop if tablet is empty).', 'soda-elementor-addons'),
+            ]
+        );
+
+        $custom_repeater->add_control(
+            'row_span_mobile',
+            [
+                'label' => __('Row Span (Mobile)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the mobile extra span (or tablet if both are empty).', 'soda-elementor-addons'),
             ]
         );
 
@@ -560,6 +648,50 @@ class Magazine_Grid extends Widget_Base {
         );
 
         $repeater->add_control(
+            'column_span_laptop',
+            [
+                'label' => __('Column Span (Laptop)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $repeater->add_control(
+            'column_span_tablet',
+            [
+                'label' => __('Column Span (Tablet)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $repeater->add_control(
+            'column_span_mobile_extra',
+            [
+                'label' => __('Column Span (Mobile Extra)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the tablet span (or desktop if tablet is empty).', 'soda-elementor-addons'),
+            ]
+        );
+
+        $repeater->add_control(
+            'column_span_mobile',
+            [
+                'label' => __('Column Span (Mobile)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 12,
+                'description' => __('Leave empty to inherit the mobile extra span (or tablet if both are empty).', 'soda-elementor-addons'),
+            ]
+        );
+
+        $repeater->add_control(
             'row_span',
             [
                 'label' => __('Row Span', 'soda-elementor-addons'),
@@ -567,6 +699,50 @@ class Magazine_Grid extends Widget_Base {
                 'default' => 1,
                 'min' => 1,
                 'max' => 10,
+            ]
+        );
+
+        $repeater->add_control(
+            'row_span_laptop',
+            [
+                'label' => __('Row Span (Laptop)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $repeater->add_control(
+            'row_span_tablet',
+            [
+                'label' => __('Row Span (Tablet)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the desktop span.', 'soda-elementor-addons'),
+            ]
+        );
+
+        $repeater->add_control(
+            'row_span_mobile_extra',
+            [
+                'label' => __('Row Span (Mobile Extra)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the tablet span (or desktop if tablet is empty).', 'soda-elementor-addons'),
+            ]
+        );
+
+        $repeater->add_control(
+            'row_span_mobile',
+            [
+                'label' => __('Row Span (Mobile)', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 1,
+                'max' => 10,
+                'description' => __('Leave empty to inherit the mobile extra span (or tablet if both are empty).', 'soda-elementor-addons'),
             ]
         );
 
@@ -683,6 +859,75 @@ class Magazine_Grid extends Widget_Base {
                     'show_title' => 'yes',
                     'title_source' => 'custom_field',
                 ],
+            ]
+        );
+
+        $this->add_control(
+            'title_word_limit',
+            [
+                'label' => __('Title Word Limit', 'soda-elementor-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 0,
+                'max' => 50,
+                'description' => __('Limit the number of words displayed in the title. Leave empty or set to 0 to show the full title.', 'soda-elementor-addons'),
+                'condition' => [
+                    'show_title' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'title_trim_suffix',
+            [
+                'label' => __('Trim Suffix', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '...',
+                'description' => __('Text appended to the title when it is trimmed.', 'soda-elementor-addons'),
+                'condition' => [
+                    'show_title' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'link_source',
+            [
+                'label' => __('Link Source', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'permalink' => __('Default Permalink', 'soda-elementor-addons'),
+                    'custom_field' => __('Custom Field', 'soda-elementor-addons'),
+                ],
+                'default' => 'permalink',
+                'condition' => [
+                    'content_source' => 'posts',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'custom_link_field',
+            [
+                'label' => __('Link Field Key', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '_slider_url_link',
+                'description' => __('Meta key used to fetch the URL when Link Source is set to Custom Field. Falls back to the permalink if empty or invalid.', 'soda-elementor-addons'),
+                'condition' => [
+                    'content_source' => 'posts',
+                    'link_source' => 'custom_field',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'click_entire_item',
+            [
+                'label' => __('Make Entire Item Clickable', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'soda-elementor-addons'),
+                'label_off' => __('No', 'soda-elementor-addons'),
+                'return_value' => 'yes',
+                'default' => 'no',
             ]
         );
 
@@ -881,7 +1126,7 @@ class Magazine_Grid extends Widget_Base {
             ]
         );
 
-        $this->add_control(
+        $this->add_responsive_control(
             'content_padding',
             [
                 'label' => __('Padding', 'soda-elementor-addons'),
@@ -932,7 +1177,7 @@ class Magazine_Grid extends Widget_Base {
             Group_Control_Typography::get_type(),
             [
                 'name' => 'title_typography',
-                'selector' => '{{WRAPPER}} .ue-grid-item-title a',
+                'selector' => '{{WRAPPER}} .ue-grid-item-title .ue-grid-item-title-text',
             ]
         );
 
@@ -943,7 +1188,7 @@ class Magazine_Grid extends Widget_Base {
                 'type' => Controls_Manager::COLOR,
                 'default' => '#ffffff',
                 'selectors' => [
-                    '{{WRAPPER}} .ue-grid-item-title a' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .ue-grid-item-title .ue-grid-item-title-text' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -954,7 +1199,7 @@ class Magazine_Grid extends Widget_Base {
                 'label' => __('Hover Color', 'soda-elementor-addons'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .ue-grid-item-title a:hover' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .ue-grid-item-title .ue-grid-item-title-text:hover' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -1423,6 +1668,134 @@ class Magazine_Grid extends Widget_Base {
     }
 
     /**
+     * Determine which link should be used for the current post.
+     */
+    private function resolve_post_link($post_id, $settings) {
+        $link = get_permalink($post_id);
+
+        if (!empty($settings['link_source']) && $settings['link_source'] === 'custom_field') {
+            $meta_key = !empty($settings['custom_link_field']) ? $settings['custom_link_field'] : '_slider_url_link';
+
+            if (!empty($meta_key)) {
+                $meta_value = get_post_meta($post_id, $meta_key, true);
+
+                if (is_array($meta_value)) {
+                    $meta_value = array_filter(array_map('trim', $meta_value));
+                    $meta_value = reset($meta_value);
+                }
+
+                if (is_string($meta_value)) {
+                    $meta_value = trim($meta_value);
+                }
+
+                if (!empty($meta_value)) {
+                    $sanitized = esc_url_raw($meta_value);
+
+                    if (!empty($sanitized)) {
+                        $link = $sanitized;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Allow developers to filter the resolved link before output.
+         */
+        return apply_filters('soda_magazine_grid_resolved_link', $link, $post_id, $settings);
+    }
+
+    /**
+     * Build inline style string for grid span values across responsive breakpoints.
+     */
+    private function build_grid_span_style($layout) {
+        if (!is_array($layout)) {
+            $layout = [];
+        }
+
+        $col_desktop = isset($layout['column_span']) ? max(1, (int) $layout['column_span']) : 1;
+        $row_desktop = isset($layout['row_span']) ? max(1, (int) $layout['row_span']) : 1;
+
+        $col_laptop = isset($layout['column_span_laptop']) ? max(0, (int) $layout['column_span_laptop']) : 0;
+        $row_laptop = isset($layout['row_span_laptop']) ? max(0, (int) $layout['row_span_laptop']) : 0;
+
+        $col_tablet = isset($layout['column_span_tablet']) ? max(0, (int) $layout['column_span_tablet']) : 0;
+        $row_tablet = isset($layout['row_span_tablet']) ? max(0, (int) $layout['row_span_tablet']) : 0;
+
+        $col_mobile_extra = isset($layout['column_span_mobile_extra']) ? max(0, (int) $layout['column_span_mobile_extra']) : 0;
+        $row_mobile_extra = isset($layout['row_span_mobile_extra']) ? max(0, (int) $layout['row_span_mobile_extra']) : 0;
+
+        $col_mobile = isset($layout['column_span_mobile']) ? max(0, (int) $layout['column_span_mobile']) : 0;
+        $row_mobile = isset($layout['row_span_mobile']) ? max(0, (int) $layout['row_span_mobile']) : 0;
+
+        $style_parts = [
+            sprintf('grid-column: span %d', $col_desktop),
+            sprintf('grid-row: span %d', $row_desktop),
+            sprintf('--ue-col-span-desktop: %d', $col_desktop),
+            sprintf('--ue-row-span-desktop: %d', $row_desktop),
+        ];
+
+        if ($col_laptop > 0) {
+            $style_parts[] = sprintf('--ue-col-span-laptop: %d', $col_laptop);
+        }
+
+        if ($row_laptop > 0) {
+            $style_parts[] = sprintf('--ue-row-span-laptop: %d', $row_laptop);
+        }
+
+        if ($col_tablet > 0) {
+            $style_parts[] = sprintf('--ue-col-span-tablet: %d', $col_tablet);
+        }
+
+        if ($row_tablet > 0) {
+            $style_parts[] = sprintf('--ue-row-span-tablet: %d', $row_tablet);
+        }
+
+        if ($col_mobile_extra > 0) {
+            $style_parts[] = sprintf('--ue-col-span-mobile-extra: %d', $col_mobile_extra);
+        }
+
+        if ($row_mobile_extra > 0) {
+            $style_parts[] = sprintf('--ue-row-span-mobile-extra: %d', $row_mobile_extra);
+        }
+
+        if ($col_mobile > 0) {
+            $style_parts[] = sprintf('--ue-col-span-mobile: %d', $col_mobile);
+        }
+
+        if ($row_mobile > 0) {
+            $style_parts[] = sprintf('--ue-row-span-mobile: %d', $row_mobile);
+        }
+
+        return implode('; ', $style_parts) . ';';
+    }
+
+    /**
+     * Optionally trim the title using the provided settings.
+     */
+    private function trim_title_text($title, $settings) {
+        if (!is_string($title)) {
+            $title = (string) $title;
+        }
+
+        $limit = isset($settings['title_word_limit']) ? (int) $settings['title_word_limit'] : 0;
+
+        if ($limit > 0) {
+            $suffix = isset($settings['title_trim_suffix']) ? $settings['title_trim_suffix'] : '...';
+            $suffix = is_string($suffix) && $suffix !== '' ? $suffix : '...';
+
+            $plain_title = trim(wp_strip_all_tags($title));
+
+            if ($plain_title === '') {
+                return '';
+            }
+
+            $title = wp_trim_words($plain_title, $limit, $suffix);
+        }
+
+        return $title;
+    }
+
+    /**
      * Get custom excerpt
      */
     private function get_excerpt($length = 20) {
@@ -1471,24 +1844,38 @@ class Magazine_Grid extends Widget_Base {
              class="post-magazine-grid <?php echo esc_attr($content_position_class); ?> <?php echo esc_attr($hover_effect_class); ?> ue-items-wrapper"
              data-hover-effect="<?php echo esc_attr($settings['item_hover_effect']); ?>">
             
-            <?php foreach ($custom_items as $index => $item) :
-                $col_span = isset($item['column_span']) ? $item['column_span'] : 1;
-                $row_span = isset($item['row_span']) ? $item['row_span'] : 1;
-                $grid_style = sprintf('grid-column: span %d; grid-row: span %d;', $col_span, $row_span);
-                
-                $link_url = !empty($item['item_link']['url']) ? $item['item_link']['url'] : '#';
-                $link_target = !empty($item['item_link']['is_external']) ? ' target="_blank"' : '';
-                $link_nofollow = !empty($item['item_link']['nofollow']) ? ' rel="nofollow"' : '';
+            <?php
+            $click_entire_item = !empty($settings['click_entire_item']) && $settings['click_entire_item'] === 'yes';
+
+            foreach ($custom_items as $index => $item) :
+                $grid_style = $this->build_grid_span_style($item);
+                $link_url = !empty($item['item_link']['url']) ? $item['item_link']['url'] : '';
+                $link_target_attr = !empty($item['item_link']['is_external']) ? ' target="_blank"' : '';
+                $link_rel_attr = !empty($item['item_link']['nofollow']) ? ' rel="nofollow"' : '';
+                $has_link = !empty($link_url);
+                $is_full_clickable = $click_entire_item && $has_link;
+                $wrapper_tag = $is_full_clickable ? 'a' : 'div';
+
+                $raw_title = isset($item['item_title']) ? $item['item_title'] : '';
+                $display_title = $this->trim_title_text($raw_title, $settings);
+                $normalized_title = trim(wp_strip_all_tags($display_title));
                 ?>
-                
-                <div class="ue-grid-item" style="<?php echo esc_attr($grid_style); ?>">
-                    
+
+                <<?php echo $wrapper_tag; ?> class="ue-grid-item<?php echo $is_full_clickable ? ' ue-grid-item--clickable' : ''; ?>" style="<?php echo esc_attr($grid_style); ?>"<?php
+                    if ($is_full_clickable) {
+                        echo ' href="' . esc_url($link_url) . '"' . $link_target_attr . $link_rel_attr;
+                        if ($normalized_title !== '') {
+                            echo ' aria-label="' . esc_attr($normalized_title) . '"';
+                        }
+                    }
+                ?>>
+
                     <?php if ($settings['show_image'] === 'yes' && !empty($item['item_image']['url'])) : ?>
                         <div class="ue-grid-item-image">
                             <?php
                             $image_url = $item['item_image']['url'];
                             $image_id = $item['item_image']['id'];
-                            
+
                             if ($image_id) {
                                 $image_size = $settings['image_size_size'];
                                 if ($image_size === 'custom') {
@@ -1505,53 +1892,80 @@ class Magazine_Grid extends Widget_Base {
                                 echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($item['item_title']) . '" ' . ($index === 0 ? '' : 'loading="lazy"') . ' decoding="async">';
                             }
                             ?>
-                            <a class="ue-grid-item-image-overlay" href="<?php echo esc_url($link_url); ?>"<?php echo $link_target . $link_nofollow; ?>></a>
+                            <?php if ($has_link && !$is_full_clickable) : ?>
+                                <a class="ue-grid-item-image-overlay" href="<?php echo esc_url($link_url); ?>"<?php echo $link_target_attr . $link_rel_attr; ?>></a>
+                            <?php else : ?>
+                                <span class="ue-grid-item-image-overlay" aria-hidden="true"></span>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
-                    
+
                     <div class="ue-grid-item-content">
-                        
-                        <?php if ($settings['show_title'] === 'yes' && !empty($item['item_title'])) : ?>
+
+                        <?php if ($settings['show_title'] === 'yes' && $normalized_title !== '') : ?>
                             <<?php echo esc_attr($settings['title_tag']); ?> class="ue-grid-item-title">
-                                <a href="<?php echo esc_url($link_url); ?>"<?php echo $link_target . $link_nofollow; ?>><?php echo esc_html($item['item_title']); ?></a>
+                                <?php if ($has_link && !$is_full_clickable) : ?>
+                                    <a href="<?php echo esc_url($link_url); ?>"<?php echo $link_target_attr . $link_rel_attr; ?> class="ue-grid-item-title-text"><?php echo esc_html($display_title); ?></a>
+                                <?php else : ?>
+                                    <span class="ue-grid-item-title-text"><?php echo esc_html($display_title); ?></span>
+                                <?php endif; ?>
                             </<?php echo esc_attr($settings['title_tag']); ?>>
                         <?php endif; ?>
-                        
+
                         <?php if ($settings['show_excerpt'] === 'yes' && !empty($item['item_excerpt'])) : ?>
                             <div class="ue-grid-item-excerpt">
                                 <?php echo esc_html($item['item_excerpt']); ?>
                             </div>
                         <?php endif; ?>
-                        
+
                         <?php if (!empty($item['show_button']) && $item['show_button'] === 'yes') : ?>
-                            <a href="<?php echo esc_url($link_url); ?>"<?php echo $link_target . $link_nofollow; ?> class="ue-grid-item-button">
-                                <?php
-                                // Icon before text
-                                if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'before') {
-                                    echo '<span class="button-icon button-icon-before">';
-                                    \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
-                                    echo '</span>';
-                                }
-                                
-                                // Button text
-                                if (!empty($item['button_text'])) {
-                                    echo '<span class="button-text">' . esc_html($item['button_text']) . '</span>';
-                                }
-                                
-                                // Icon after text
-                                if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'after') {
-                                    echo '<span class="button-icon button-icon-after">';
-                                    \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
-                                    echo '</span>';
-                                }
-                                ?>
-                            </a>
+                            <?php if ($has_link && !$is_full_clickable) : ?>
+                                <a href="<?php echo esc_url($link_url); ?>"<?php echo $link_target_attr . $link_rel_attr; ?> class="ue-grid-item-button">
+                                    <?php
+                                    if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'before') {
+                                        echo '<span class="button-icon button-icon-before">';
+                                        \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
+                                        echo '</span>';
+                                    }
+
+                                    if (!empty($item['button_text'])) {
+                                        echo '<span class="button-text">' . esc_html($item['button_text']) . '</span>';
+                                    }
+
+                                    if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'after') {
+                                        echo '<span class="button-icon button-icon-after">';
+                                        \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
+                                        echo '</span>';
+                                    }
+                                    ?>
+                                </a>
+                            <?php else : ?>
+                                <span class="ue-grid-item-button ue-grid-item-button--static">
+                                    <?php
+                                    if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'before') {
+                                        echo '<span class="button-icon button-icon-before">';
+                                        \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
+                                        echo '</span>';
+                                    }
+
+                                    if (!empty($item['button_text'])) {
+                                        echo '<span class="button-text">' . esc_html($item['button_text']) . '</span>';
+                                    }
+
+                                    if (!empty($item['button_icon']['value']) && $item['button_icon_position'] === 'after') {
+                                        echo '<span class="button-icon button-icon-after">';
+                                        \Elementor\Icons_Manager::render_icon($item['button_icon'], ['aria-hidden' => 'true']);
+                                        echo '</span>';
+                                    }
+                                    ?>
+                                </span>
+                            <?php endif; ?>
                         <?php endif; ?>
-                        
+
                     </div>
-                    
-                </div>
-                
+
+                </<?php echo $wrapper_tag; ?>>
+
             <?php endforeach; ?>
             
         </div>
@@ -1700,27 +2114,40 @@ class Magazine_Grid extends Widget_Base {
                     continue;
                 }
                 
-                $display_title = $this->resolve_post_title(get_the_ID(), $settings);
-                $normalized_title = trim(wp_strip_all_tags($display_title));
+                $raw_title = $this->resolve_post_title(get_the_ID(), $settings);
+                $raw_normalized_title = trim(wp_strip_all_tags($raw_title));
 
                 // Skip posts with empty/default titles if option is enabled
                 if ($settings['hide_empty_title'] === 'yes') {
                     $empty_titles = ['sin título', 'sin titulo', 'untitled', '(no title)', 'auto draft', ''];
 
-                    if ($normalized_title === '' || in_array(strtolower($normalized_title), $empty_titles, true)) {
+                    if ($raw_normalized_title === '' || in_array(strtolower($raw_normalized_title), $empty_titles, true)) {
                         continue;
                     }
                 }
+
+                $display_title = $this->trim_title_text($raw_title, $settings);
+                $normalized_title = trim(wp_strip_all_tags($display_title));
+
+                $resolved_link = $this->resolve_post_link(get_the_ID(), $settings);
+                $has_link = !empty($resolved_link);
+                $click_entire_item = !empty($settings['click_entire_item']) && $settings['click_entire_item'] === 'yes';
+                $is_full_clickable = $click_entire_item && $has_link;
+                $wrapper_tag = $is_full_clickable ? 'a' : 'div';
                 
                 // Get current grid item layout (cycle through if more posts than defined items)
                 $current_layout = $grid_items[$displayed_items % $grid_items_count];
-                $col_span = isset($current_layout['column_span']) ? $current_layout['column_span'] : 1;
-                $row_span = isset($current_layout['row_span']) ? $current_layout['row_span'] : 1;
-                
-                $grid_style = sprintf('grid-column: span %d; grid-row: span %d;', $col_span, $row_span);
+                $grid_style = $this->build_grid_span_style($current_layout);
                 
                 ?>
-                <div class="ue-grid-item" style="<?php echo esc_attr($grid_style); ?>">
+                <<?php echo $wrapper_tag; ?> class="ue-grid-item<?php echo $is_full_clickable ? ' ue-grid-item--clickable' : ''; ?>" style="<?php echo esc_attr($grid_style); ?>"<?php
+                    if ($is_full_clickable) {
+                        echo ' href="' . esc_url($resolved_link) . '"';
+                        if ($normalized_title !== '') {
+                            echo ' aria-label="' . esc_attr($normalized_title) . '"';
+                        }
+                    }
+                ?>>
                     
                     <?php if ($settings['show_image'] === 'yes' && has_post_thumbnail()) : ?>
                         <div class="ue-grid-item-image">
@@ -1738,7 +2165,11 @@ class Magazine_Grid extends Widget_Base {
                                 'decoding' => 'async',
                             ]);
                             ?>
-                            <a class="ue-grid-item-image-overlay" href="<?php the_permalink(); ?>"></a>
+                            <?php if ($has_link && !$is_full_clickable) : ?>
+                                <a class="ue-grid-item-image-overlay" href="<?php echo esc_url($resolved_link); ?>"></a>
+                            <?php else : ?>
+                                <span class="ue-grid-item-image-overlay" aria-hidden="true"></span>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                     
@@ -1772,7 +2203,11 @@ class Magazine_Grid extends Widget_Base {
                         
                         <?php if ($settings['show_title'] === 'yes' && $normalized_title !== '') : ?>
                             <<?php echo esc_attr($settings['title_tag']); ?> class="ue-grid-item-title">
-                                <a href="<?php echo esc_url(get_permalink()); ?>"><?php echo esc_html($display_title); ?></a>
+                                <?php if ($has_link && !$is_full_clickable) : ?>
+                                    <a href="<?php echo esc_url($resolved_link); ?>" class="ue-grid-item-title-text"><?php echo esc_html($display_title); ?></a>
+                                <?php else : ?>
+                                    <span class="ue-grid-item-title-text"><?php echo esc_html($display_title); ?></span>
+                                <?php endif; ?>
                             </<?php echo esc_attr($settings['title_tag']); ?>>
                         <?php endif; ?>
                         
@@ -1784,7 +2219,7 @@ class Magazine_Grid extends Widget_Base {
                         
                     </div>
                     
-                </div>
+                </<?php echo $wrapper_tag; ?>>
                 <?php
                 $displayed_items++;
             }
