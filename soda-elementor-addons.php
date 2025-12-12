@@ -88,6 +88,7 @@ final class Elementor_Menu_Widget_V2 {
         add_action('updated_post_meta', [$this, 'resize_noticias_featured_image_on_set'], 10, 4);
 
         $this->register_municipio_shortcodes();
+        add_action('elementor/query/current_municipio', [$this, 'filter_current_municipio_query']);
     }
 
     public function load_custom_icons() {
@@ -783,6 +784,29 @@ final class Elementor_Menu_Widget_V2 {
         }
 
         return sprintf('<span class="municipio-title">%s</span>', esc_html($title));
+    }
+
+    /**
+     * Limit Elementor current_municipio queries to the active municipio post.
+     */
+    public function filter_current_municipio_query($query) {
+        if (!($query instanceof \WP_Query)) {
+            return;
+        }
+
+        $current_id = get_queried_object_id();
+
+        if (!$current_id && is_singular('municipio')) {
+            $current_id = get_the_ID();
+        }
+
+        if (!$current_id) {
+            return;
+        }
+
+        $query->set('post_type', ['municipio']);
+        $query->set('post__in', [$current_id]);
+        $query->set('orderby', 'post__in');
     }
 }
 
