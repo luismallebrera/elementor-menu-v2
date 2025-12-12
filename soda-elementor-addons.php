@@ -151,11 +151,11 @@ final class Elementor_Menu_Widget_V2 {
         $widgets_dir = __DIR__ . '/widgets/';
         if (is_dir($widgets_dir)) {
             $widget_files = glob($widgets_dir . '*.php');
-            
+
             foreach ($widget_files as $widget_file) {
                 $filename = basename($widget_file, '.php');
                    require_once($widget_file);
-                
+
                 // Handle menu-toggle-widget-v2.php (legacy naming without namespace)
                 if ($filename === 'menu-toggle-widget-v2') {
                     if (class_exists('Elementor_Menu_Toggle_Widget_V2')) {
@@ -163,10 +163,10 @@ final class Elementor_Menu_Widget_V2 {
                     }
                     continue;
                 }
-                
+
                 // All other widgets use SodaAddons\Widgets namespace
                 $class_name = 'SodaAddons\Widgets\\' . $filename;
-                
+
                 if (class_exists($class_name)) {
                     $widgets_manager->register(new $class_name());
                 }
@@ -539,7 +539,7 @@ final class Elementor_Menu_Widget_V2 {
 
         // Resize first
         $resize_result = $image_editor->resize($resize_width, $resize_height, false);
-        
+
         if (is_wp_error($resize_result)) {
             delete_post_meta($post_id, $processed_key);
             return;
@@ -548,9 +548,9 @@ final class Elementor_Menu_Widget_V2 {
         // Now crop to exact dimensions from center
         $crop_x = max(0, round(($resize_width - $target_width) / 2));
         $crop_y = max(0, round(($resize_height - $target_height) / 2));
-        
+
         $crop_result = $image_editor->crop($crop_x, $crop_y, $target_width, $target_height);
-        
+
         if (is_wp_error($crop_result)) {
             delete_post_meta($post_id, $processed_key);
             return;
@@ -558,16 +558,16 @@ final class Elementor_Menu_Widget_V2 {
 
         // Save the resized and cropped image (overwrite original)
         $saved = $image_editor->save($file_path);
-        
+
         if (!is_wp_error($saved)) {
             // Convert to WebP format
             $this->convert_to_webp($file_path, $attachment_id);
-            
+
             // Regenerate metadata with new dimensions
             require_once(ABSPATH . 'wp-admin/includes/image.php');
             $metadata = wp_generate_attachment_metadata($attachment_id, $file_path);
             wp_update_attachment_metadata($attachment_id, $metadata);
-            
+
             // Clear any cached sizes
             clean_attachment_cache($attachment_id);
         } else {
@@ -597,31 +597,31 @@ final class Elementor_Menu_Widget_V2 {
 
         // Set output format to WebP
         $image_editor->set_mime_type('image/webp');
-        
+
         // Set WebP quality to 70%
         $image_editor->set_quality(70);
-        
+
         // Save as WebP with 70% quality
         $saved = $image_editor->save($webp_file, 'image/webp');
-        
+
         if (!is_wp_error($saved)) {
             // Update attachment to point to WebP file
             update_attached_file($attachment_id, $webp_file);
-            
+
             // Update post mime type
             wp_update_post([
                 'ID' => $attachment_id,
                 'post_mime_type' => 'image/webp'
             ]);
-            
+
             // Delete the original file to save space
             if (file_exists($original_file) && $original_file !== $webp_file) {
                 @unlink($original_file);
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -794,7 +794,7 @@ final class Elementor_Menu_Widget_V2 {
             return;
         }
 
-        $current_id = get_queried_object_id();
+        $current_id = $this->resolve_municipio_context_id([]);
 
         if (!$current_id && is_singular('municipio')) {
             $current_id = get_the_ID();
@@ -806,7 +806,9 @@ final class Elementor_Menu_Widget_V2 {
 
         $query->set('post_type', ['municipio']);
         $query->set('post__in', [$current_id]);
+        $query->set('posts_per_page', 1);
         $query->set('orderby', 'post__in');
+        $query->set('ignore_sticky_posts', true);
     }
 }
 
