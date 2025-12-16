@@ -89,6 +89,199 @@ final class Elementor_Menu_Widget_V2 {
     }
 
     public function load_parallax_background() {
+        require_once(__DIR__ . '/modules/parallax-background.php');
+    }
+
+    public function load_liquid_glass() {
+        require_once(__DIR__ . '/modules/liquid-glass/liquid-glass.php');
+        new \Elementor\Soda_Liquid_Glass();
+    }
+
+    public function register_category($elements_manager) {
+        $elements_manager->add_category(
+            'soda-addons',
+            [
+                'title' => __('Soda Addons', 'soda-elementor-addons'),
+                'icon'  => 'fa fa-plug',
+            ]
+        );
+    }
+
+    public function admin_notice_missing_main_plugin() {
+        if (isset($_GET['activate'])) {
+            unset($_GET['activate']);
+        }
+
+        $message = sprintf(
+            esc_html__('"%1$s" requires "%2$s" to be installed and activated.', 'soda-elementor-addons'),
+            '<strong>' . esc_html__('Soda Elementor Addons', 'soda-elementor-addons') . '</strong>',
+            '<strong>' . esc_html__('Elementor', 'soda-elementor-addons') . '</strong>'
+        );
+
+        printf('<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message);
+    }
+
+    public function admin_notice_minimum_elementor_version() {
+        if (isset($_GET['activate'])) {
+            unset($_GET['activate']);
+        }
+
+        $message = sprintf(
+            esc_html__('"%1$s" requires "%2$s" version %3$s or greater.', 'soda-elementor-addons'),
+            '<strong>' . esc_html__('Soda Elementor Addons', 'soda-elementor-addons') . '</strong>',
+            '<strong>' . esc_html__('Elementor', 'soda-elementor-addons') . '</strong>',
+            self::MINIMUM_ELEMENTOR_VERSION
+        );
+
+        printf('<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message);
+    }
+
+    public function admin_notice_minimum_php_version() {
+        if (isset($_GET['activate'])) {
+            unset($_GET['activate']);
+        }
+
+        $message = sprintf(
+            esc_html__('"%1$s" requires "%2$s" version %3$s or greater.', 'soda-elementor-addons'),
+            '<strong>' . esc_html__('Soda Elementor Addons', 'soda-elementor-addons') . '</strong>',
+            '<strong>' . esc_html__('PHP', 'soda-elementor-addons') . '</strong>',
+            self::MINIMUM_PHP_VERSION
+        );
+
+        printf('<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message);
+    }
+
+    public function register_widgets($widgets_manager) {
+        $widgets_dir = __DIR__ . '/widgets/';
+
+        if (!is_dir($widgets_dir)) {
+            return;
+        }
+
+        $widget_files = glob($widgets_dir . '*.php');
+
+        foreach ($widget_files as $widget_file) {
+            $filename = basename($widget_file, '.php');
+
+            require_once $widget_file;
+
+            if ($filename === 'menu-toggle-widget-v2') {
+                if (class_exists('Elementor_Menu_Toggle_Widget_V2')) {
+                    $widgets_manager->register(new \Elementor_Menu_Toggle_Widget_V2());
+                }
+
+                continue;
+            }
+
+            $class_name = 'SodaAddons\\Widgets\\' . $filename;
+
+            if (class_exists($class_name)) {
+                $widgets_manager->register(new $class_name());
+            }
+        }
+    }
+
+    public function widget_styles() {
+        // Menu widget style
+        wp_enqueue_style(
+            'elementor-menu-widget-v2',
+            plugins_url('assets/css/menu-widget-v2.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        // CubePortfolio
+        wp_register_style(
+            'cubeportfolio-css',
+            plugins_url('assets/css/cubeportfolio.min.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'cubeportfolio-filters-toggle-css',
+            plugins_url('assets/css/filters-toggle.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-arrow-button',
+            plugins_url('assets/css/arrow-button.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-reverse-columns-gallery',
+            plugins_url('assets/css/reverse-columns-gallery.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'frontend-widgets',
+            plugins_url('assets/css/frontend-widgets.min.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        // Widget-specific styles
+        wp_register_style(
+            'soda-moving-gallery',
+            plugins_url('assets/css/moving-gallery.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-pinned-gallery',
+            plugins_url('assets/css/pinned-gallery.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-zoom-gallery',
+            plugins_url('assets/css/zoom-gallery.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-horizontal-gallery',
+            plugins_url('assets/css/horizontal-gallery.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-portfolio-grid',
+            plugins_url('assets/css/portfolio-grid.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-magazine-grid',
+            plugins_url('assets/css/magazine-grid.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-breadcrumbs',
+            plugins_url('assets/css/breadcrumbs.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-post-navigation',
+            plugins_url('post-navigation/assets/css/soda-post-navigation.css', __FILE__),
+            [],
+            self::VERSION
+        );
 
         wp_register_style(
             'soda-image-pan-zoom',
@@ -116,6 +309,13 @@ final class Elementor_Menu_Widget_V2 {
         wp_register_style(
             'soda-list-widget',
             plugins_url('assets/css/list-widget.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
+        wp_register_style(
+            'soda-table',
+            plugins_url('assets/css/table-widget.css', __FILE__),
             [],
             self::VERSION
         );
@@ -268,6 +468,14 @@ final class Elementor_Menu_Widget_V2 {
             'soda-liquid-glass',
             plugins_url('assets/js/liquid-glass.js', __FILE__),
             ['elementor-frontend'],
+            self::VERSION,
+            true
+        );
+
+        wp_register_script(
+            'soda-fullscreen-toggle',
+            plugins_url('assets/js/fullscreen-toggle.js', __FILE__),
+            ['jquery', 'elementor-frontend'],
             self::VERSION,
             true
         );

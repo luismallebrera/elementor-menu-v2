@@ -84,6 +84,52 @@ class Breadcrumbs extends Widget_Base {
         );
 
         $this->add_control(
+            'custom_link_text',
+            [
+                'label' => __('Custom Link Text', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '',
+                'placeholder' => __('e.g., mi-sitio', 'soda-elementor-addons'),
+                'description' => __('Add a custom link after Home (e.g., /mi-sitio/)', 'soda-elementor-addons'),
+                'condition' => [
+                    'show_home' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'custom_link_url',
+            [
+                'label' => __('Custom Link URL', 'soda-elementor-addons'),
+                'type' => Controls_Manager::TEXT,
+                'default' => '',
+                'placeholder' => __('e.g., /mi-sitio/', 'soda-elementor-addons'),
+                'description' => __('URL for the custom link', 'soda-elementor-addons'),
+                'condition' => [
+                    'show_home' => 'yes',
+                    'custom_link_text!' => '',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'custom_link_position',
+            [
+                'label' => __('Custom Link Position', 'soda-elementor-addons'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'after_home' => __('After Home', 'soda-elementor-addons'),
+                    'end' => __('End of Trail', 'soda-elementor-addons'),
+                ],
+                'default' => 'after_home',
+                'condition' => [
+                    'show_home' => 'yes',
+                    'custom_link_text!' => '',
+                ],
+            ]
+        );
+
+        $this->add_control(
             'separator',
             [
                 'label' => __('Separator', 'soda-elementor-addons'),
@@ -701,21 +747,55 @@ class Breadcrumbs extends Widget_Base {
             ? $settings['separator_custom'] 
             : $settings['separator'];
         
+        $custom_text = isset($settings['custom_link_text']) ? trim($settings['custom_link_text']) : '';
+        $custom_url = $settings['custom_link_url'] ?? '';
+        $custom_position = $settings['custom_link_position'] ?? 'after_home';
+
+        $render_trail = [];
+        $custom_added = false;
+
+        foreach ($trail as $index => $item) {
+            $render_trail[] = $item;
+
+            $should_insert_after_home = (
+                !$custom_added &&
+                $custom_text !== '' &&
+                $custom_position === 'after_home' &&
+                !empty($item['is_home']) &&
+                $settings['show_home'] === 'yes'
+            );
+
+            if ($should_insert_after_home) {
+                $render_trail[] = [
+                    'title' => $custom_text,
+                    'url' => $custom_url,
+                    'is_custom' => true,
+                ];
+                $custom_added = true;
+            }
+        }
+
+        if ($custom_text !== '' && !$custom_added) {
+            $render_trail[] = [
+                'title' => $custom_text,
+                'url' => $custom_url,
+                'is_custom' => true,
+            ];
+        }
+
         ?>
         <div class="soda-breadcrumbs">
             <?php
-            $count = count($trail);
-            foreach ($trail as $index => $item) :
+            $count = count($render_trail);
+            foreach ($render_trail as $index => $item) :
                 $is_last = ($index === $count - 1);
                 $is_home = !empty($item['is_home']);
                 $is_current = !empty($item['is_current']);
-                
-                // Skip home if disabled
+
                 if ($is_home && $settings['show_home'] !== 'yes') {
                     continue;
                 }
-                
-                // Shorten title if needed
+
                 $title = $item['title'];
                 if ($is_current && $settings['shorten_title'] === 'yes') {
                     $title = $this->shorten_text(
@@ -729,7 +809,7 @@ class Breadcrumbs extends Widget_Base {
                     );
                 }
                 ?>
-                
+
                 <span class="breadcrumb-item<?php echo $is_current ? ' current' : ''; ?>">
                     <?php if (!$is_current && !empty($item['url'])) : ?>
                         <a href="<?php echo esc_url($item['url']); ?>">
@@ -748,7 +828,7 @@ class Breadcrumbs extends Widget_Base {
                         <?php echo esc_html($title); ?>
                     <?php endif; ?>
                 </span>
-                
+
                 <?php if (!$is_last) : ?>
                     <span class="breadcrumb-separator">
                         <?php if ($settings['separator'] === 'custom' && !empty($settings['separator_icon']['value'])) : ?>
@@ -758,7 +838,7 @@ class Breadcrumbs extends Widget_Base {
                         <?php endif; ?>
                     </span>
                 <?php endif; ?>
-                
+
             <?php endforeach; ?>
         </div>
         <?php
