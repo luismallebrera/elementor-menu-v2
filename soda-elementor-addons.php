@@ -160,12 +160,32 @@ final class Elementor_Menu_Widget_V2 {
 
         $widget_files = glob($widgets_dir . '*.php');
 
+        $widget_class_map = [
+            'soda_arrow_button_widget'            => 'Arrow_Button_Widget',
+            'soda_breadcrumbs_widget'             => 'Breadcrumbs',
+            'soda_cubeportfolio_widget'           => 'CubePortfolio_Widget',
+            'soda_entry_list_widget'              => 'Entry_List_Widget',
+            'soda_fullscreen_toggle_widget'       => 'Fullscreen_Toggle',
+            'soda_horizontal_gallery_widget'      => 'Horizontal_Gallery',
+            'soda_list_widget_widget'             => 'List_Widget',
+            'soda_lottie_widget_widget'           => 'Lottie_Widget',
+            'soda_moving_gallery_widget'          => 'Moving_Gallery',
+            'soda_pinned_gallery_widget'          => 'Pinned_Gallery',
+            'soda_post_navigation_widget'         => 'Post_Navigation',
+            'soda_post_title_widget'              => 'Post_Title_Widget',
+            'soda_reverse_columns_gallery_widget' => 'Reverse_Columns_Gallery_Widget',
+            'soda_button_widget'                  => 'Soda_Button',
+            'soda_table_widget'                   => 'Table_Widget',
+            'soda_taxonomy_list_widget'           => 'Taxonomy_List_Widget',
+            'soda_zoom_gallery_widget'            => 'Zoom_Gallery',
+        ];
+
         foreach ($widget_files as $widget_file) {
             $filename = basename($widget_file, '.php');
 
             require_once $widget_file;
 
-            if ($filename === 'menu-toggle-widget-v2') {
+            if ($filename === 'soda_menu_widget_widget') {
                 if (class_exists('Elementor_Menu_Toggle_Widget_V2')) {
                     $widgets_manager->register(new \Elementor_Menu_Toggle_Widget_V2());
                 }
@@ -173,7 +193,8 @@ final class Elementor_Menu_Widget_V2 {
                 continue;
             }
 
-            $class_name = 'SodaAddons\\Widgets\\' . $filename;
+            $class_base = $widget_class_map[$filename] ?? $filename;
+            $class_name = 'SodaAddons\\Widgets\\' . $class_base;
 
             if (class_exists($class_name)) {
                 $widgets_manager->register(new $class_name());
@@ -278,7 +299,7 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_style(
             'soda-post-navigation',
-            plugins_url('post-navigation/assets/css/soda-post-navigation.css', __FILE__),
+            plugins_url('assets/css/soda-post-navigation.css', __FILE__),
             [],
             self::VERSION
         );
