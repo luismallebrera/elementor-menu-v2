@@ -1,0 +1,23 @@
+.soda-back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 0.75em 1.5em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.soda-back-button__icon {
+    display: inline-flex;
+    align-items: center;
+}
+
+.soda-back-button--icon-right .soda-back-button__icon {
+    order: 2;
+}
+
+.soda-back-button--icon-right .soda-back-button__label {
+    order: 1;
+}

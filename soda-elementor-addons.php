@@ -161,6 +161,7 @@ final class Elementor_Menu_Widget_V2 {
         $widget_files = glob($widgets_dir . '*.php');
 
         $widget_class_map = [
+            'soda_back_button_widget'            => 'Back_Button_Widget',
             'soda_arrow_button_widget'            => 'Arrow_Button_Widget',
             'soda_breadcrumbs_widget'             => 'Breadcrumbs',
             'soda_cubeportfolio_widget'           => 'CubePortfolio_Widget',
@@ -249,6 +250,13 @@ final class Elementor_Menu_Widget_V2 {
         );
 
         // Widget-specific styles
+        wp_register_style(
+            'soda-back-button',
+            plugins_url('assets/css/soda_back_button_widget.css', __FILE__),
+            [],
+            self::VERSION
+        );
+
         wp_register_style(
             'soda-moving-gallery',
             plugins_url('assets/css/soda_moving_gallery_widget.css', __FILE__),
@@ -413,6 +421,14 @@ final class Elementor_Menu_Widget_V2 {
         );
 
         // Widget-specific scripts
+        wp_register_script(
+            'soda-back-button',
+            plugins_url('assets/js/soda_back_button_widget.js', __FILE__),
+            [],
+            self::VERSION,
+            true
+        );
+
         wp_register_script(
             'soda-moving-gallery',
             plugins_url('assets/js/soda_moving_gallery_widget.js', __FILE__),
