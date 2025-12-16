@@ -169,6 +169,7 @@ final class Elementor_Menu_Widget_V2 {
             'soda_horizontal_gallery_widget'      => 'Horizontal_Gallery',
             'soda_list_widget_widget'             => 'List_Widget',
             'soda_lottie_widget_widget'           => 'Lottie_Widget',
+            'soda_magazine_grid_widget'           => 'Magazine_Grid',
             'soda_moving_gallery_widget'          => 'Moving_Gallery',
             'soda_pinned_gallery_widget'          => 'Pinned_Gallery',
             'soda_post_navigation_widget'         => 'Post_Navigation',
