@@ -207,7 +207,7 @@ final class Elementor_Menu_Widget_V2 {
         // Menu widget style
         wp_enqueue_style(
             'elementor-menu-widget-v2',
-            plugins_url('assets/css/menu-widget-v2.css', __FILE__),
+            plugins_url('assets/css/soda_menu_widget_widget.css', __FILE__),
             [],
             self::VERSION
         );
@@ -229,14 +229,14 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_style(
             'soda-arrow-button',
-            plugins_url('assets/css/arrow-button.css', __FILE__),
+            plugins_url('assets/css/soda_arrow_button_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-reverse-columns-gallery',
-            plugins_url('assets/css/reverse-columns-gallery.css', __FILE__),
+            plugins_url('assets/css/soda_reverse_columns_gallery_widget.css', __FILE__),
             [],
             self::VERSION
         );
@@ -251,28 +251,28 @@ final class Elementor_Menu_Widget_V2 {
         // Widget-specific styles
         wp_register_style(
             'soda-moving-gallery',
-            plugins_url('assets/css/moving-gallery.css', __FILE__),
+            plugins_url('assets/css/soda_moving_gallery_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-pinned-gallery',
-            plugins_url('assets/css/pinned-gallery.css', __FILE__),
+            plugins_url('assets/css/soda_pinned_gallery_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-zoom-gallery',
-            plugins_url('assets/css/zoom-gallery.css', __FILE__),
+            plugins_url('assets/css/soda_zoom_gallery_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-horizontal-gallery',
-            plugins_url('assets/css/horizontal-gallery.css', __FILE__),
+            plugins_url('assets/css/soda_horizontal_gallery_widget.css', __FILE__),
             [],
             self::VERSION
         );
@@ -286,21 +286,21 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_style(
             'soda-magazine-grid',
-            plugins_url('assets/css/magazine-grid.css', __FILE__),
+            plugins_url('assets/css/soda_magazine_grid_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-breadcrumbs',
-            plugins_url('assets/css/breadcrumbs.css', __FILE__),
+            plugins_url('assets/css/soda_breadcrumbs_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-post-navigation',
-            plugins_url('assets/css/soda-post-navigation.css', __FILE__),
+            plugins_url('assets/css/soda_post_navigation_widget.css', __FILE__),
             [],
             self::VERSION
         );
@@ -323,21 +323,21 @@ final class Elementor_Menu_Widget_V2 {
         // Soda Button
         wp_register_style(
             'soda-button',
-            plugins_url('assets/css/soda-button.css', __FILE__),
+            plugins_url('assets/css/soda_button_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-list-widget',
-            plugins_url('assets/css/list-widget.css', __FILE__),
+            plugins_url('assets/css/soda_list_widget_widget.css', __FILE__),
             [],
             self::VERSION
         );
 
         wp_register_style(
             'soda-table',
-            plugins_url('assets/css/table-widget.css', __FILE__),
+            plugins_url('assets/css/soda_table_widget.css', __FILE__),
             [],
             self::VERSION
         );
@@ -347,7 +347,7 @@ final class Elementor_Menu_Widget_V2 {
         // Menu widget script
         wp_register_script(
             'elementor-menu-widget-v2',
-            plugins_url('assets/js/menu-widget-v2.js', __FILE__),
+            plugins_url('assets/js/soda_menu_widget_widget.js', __FILE__),
             ['jquery'],
             self::VERSION,
             true
@@ -415,7 +415,7 @@ final class Elementor_Menu_Widget_V2 {
         // Widget-specific scripts
         wp_register_script(
             'soda-moving-gallery',
-            plugins_url('assets/js/moving-gallery.js', __FILE__),
+            plugins_url('assets/js/soda_moving_gallery_widget.js', __FILE__),
             ['jquery', 'soda-gsap'],
             self::VERSION,
             true
@@ -423,7 +423,7 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_script(
             'soda-pinned-gallery',
-            plugins_url('assets/js/pinned-gallery.js', __FILE__),
+            plugins_url('assets/js/soda_pinned_gallery_widget.js', __FILE__),
             ['jquery', 'soda-gsap'],
             self::VERSION,
             true
@@ -431,7 +431,7 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_script(
             'soda-zoom-gallery',
-            plugins_url('assets/js/zoom-gallery.js', __FILE__),
+            plugins_url('assets/js/soda_zoom_gallery_widget.js', __FILE__),
             ['jquery', 'soda-gsap', 'soda-flip'],
             self::VERSION,
             true
@@ -439,7 +439,7 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_script(
             'soda-horizontal-gallery',
-            plugins_url('assets/js/horizontal-gallery.js', __FILE__),
+            plugins_url('assets/js/soda_horizontal_gallery_widget.js', __FILE__),
             ['jquery', 'soda-gsap', 'soda-scrollTrigger'],
             self::VERSION,
             true
@@ -471,7 +471,7 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_script(
             'soda-magazine-grid',
-            plugins_url('assets/js/magazine-grid.js', __FILE__),
+            plugins_url('assets/js/soda_magazine_grid_widget.js', __FILE__),
             ['jquery'],
             self::VERSION,
             true
@@ -496,7 +496,7 @@ final class Elementor_Menu_Widget_V2 {
 
         wp_register_script(
             'soda-fullscreen-toggle',
-            plugins_url('assets/js/fullscreen-toggle.js', __FILE__),
+            plugins_url('assets/js/soda_fullscreen_toggle_widget.js', __FILE__ ),
             ['jquery', 'elementor-frontend'],
             self::VERSION,
             true
